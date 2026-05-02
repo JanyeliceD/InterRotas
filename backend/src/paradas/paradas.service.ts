@@ -2,7 +2,7 @@ import{Injectable, NotFoundException} from '@nestjs/common';
 
 //Parada que o backend vai receber do dispositivo
 
-type Parada = {
+export type  Parada = {
   id: number;
   nome: string;
   local: Local;
@@ -32,10 +32,43 @@ export class ParadasService {
         bairro: 'Centro',
         cidade: 'Santa Cruz',
     },},
+    { id: 4, nome: 'Terminal Rodoviário de Tangara', local: {
+        rua: 'Av. Miguel Barbosa',
+        bairro: 'Centro',
+        cidade: 'Tangara',
+    },},
+    {id: 5, nome: 'Terminal Rodoviário de Serra Caiada', local: {
+        rua: 'Nossa Sra. da conceição',
+        bairro: 'Centro',
+        cidade: 'Serra Caiada',
+    },},
+    {
+      id:6, nome: 'Parada de Bom Jesus', local: {
+        rua: 'Almir Freire',
+        bairro: 'Centro',
+        cidade: 'Bom Jesus',
+      },
+    },
+    {
+      id:7, nome: 'Terminal Rodoviário Vereador Cícero Martins', local: {
+        rua: 'José Gomes',
+        bairro: 'Auta de Souza',
+        cidade: 'Macaíba',
+      },
+    },
+    {
+      id:8, nome: 'Terminal Rodoviário Severino Tomaz da Silveira', local: {
+        rua: 'Av. Capitão Mor Gouveia',
+        bairro: 'Cidade da Esperança',
+        cidade: 'Natal',
+      },
+    },
 
-    
   ];
-
+  getAll() {
+  return this.paradas;
+}
+   
   listar() {
     return this.paradas;
   }
