@@ -1,5 +1,8 @@
-import { Controller, Get, Param, Post, Body } from '@nestjs/common';
+import { Controller, Get, Param, Post, Body, Patch, Delete } from '@nestjs/common';
+
 import { EventoService } from './evento.service';
+import { CreateEventoDto } from './dto/create-evento.dto';
+import { UpdateEventoDto } from './dto/update-evento.dto';
 
 @Controller('evento')
 export class EventoController {
@@ -16,7 +19,17 @@ export class EventoController {
   }
 
   @Post()
-  criar(@Body() data: any) {
-    return this.eventoService.criar(data);
+  criar(@Body() body: CreateEventoDto) {
+    return this.eventoService.criar(body);
+  }
+
+  @Patch(':id')
+  atualizar(@Param('id') id: string, @Body() body: UpdateEventoDto) {
+    return this.eventoService.atualizar(id, body);
+  }
+
+  @Delete(':id')
+  remover(@Param('id') id: string) {
+    return this.eventoService.remover(id);
   }
 }
