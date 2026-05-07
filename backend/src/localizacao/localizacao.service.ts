@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { Model } from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
+import mongoose from 'mongoose';
 
 import { Parada, ParadaDocument } from 'src/schemas/parada.schemas';
 import { Evento, EventoDocument } from 'src/schemas/evento.schema';
@@ -43,19 +44,19 @@ export class LocalizacaoService {
             );
 
         if (distancia <= RAIO) {
-            const UltimoEvento = await this.eventoModel
+            const ultimoEvento = await this.eventoModel
             .findOne({ onibusId })
             .sort({ timestamp: -1 });
 
             if (
-                UltimoEvento &&
-                UltimoEvento.paradaId.toString() === parada._id.toString()
+                ultimoEvento &&
+                ultimoEvento.paradaId.toString() === parada._id.toString()
             ) {
                 return { message: 'Evento já registrado para esta parada' }
             }
 
             const evento = new this.eventoModel({
-                onibusId,
+                onibusId: new mongoose.Types.ObjectId(onibusId),
                 paradaId: parada._id,
                 timestamp: new Date(),
             });

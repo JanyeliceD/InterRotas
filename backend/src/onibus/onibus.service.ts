@@ -1,26 +1,21 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
+import { Model } from 'mongoose';
+import { InjectModel } from '@nestjs/mongoose';
 
-type Onibus = {
-    id: number;
-    placa: string;
-    modelo: string;
-    idRota: number;
-}
+import { Onibus, OnibusDocument } from '../schemas/onibus.schema';
 
 @Injectable()
 export class OnibusService {
-    private readonly onibus = [
-        { id: 1, placa: 'ABC-1234', modelo: 'Mercedes-Benz', idRota: 1 },
-        { id: 2, placa: 'DEF-5678', modelo: 'Volvo', idRota: 2 },
-        { id: 3, placa: 'GHI-9012', modelo: 'Scania', idRota: 3 },
-    ];
+    constructor(
+        @InjectModel(Onibus.name) private onibusModel: Model<OnibusDocument>
+    ) {}
 
-    listar() {
-        return this.onibus;
+    async listar() {
+        return this.onibusModel.find();
     }
 
-    buscarPorId(id: number) {
-        const onibus = this.onibus.find((onibus) => onibus.id === id);
+    async buscarPorId(id: string) {
+        const onibus = await this.onibusModel.findById(id);
 
         if (!onibus) {
             throw new NotFoundException('Ônibus não encontrado');
@@ -29,14 +24,9 @@ export class OnibusService {
         return onibus;
     }
 
-    criar(dados: Omit<Onibus, 'id'>) {
-        const novoId = this.onibus.length > 0 
-            ? Math.max(...this.onibus.map((onibus) => onibus.id)) + 1 
-            : 1;
-
-        const novoOnibus: Onibus = { id: novoId, ...dados };
-        this.onibus.push(novoOnibus);
-
-        return novoOnibus;
+    async criar(dados: Omit<Onibus, 'id'>) {
+        const novoOnibus = new this.onibusModel(dados);
+        return novoOnibus.save();
     }
+
 }
