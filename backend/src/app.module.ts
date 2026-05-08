@@ -7,6 +7,7 @@ import { ParadasModule } from './paradas/paradas.module';
 import { RotasModule } from './rotas/rotas.module';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { MongooseModule } from '@nestjs/mongoose';
+import { LocalizacaoModule } from './localizacao/localizacao.module';
 
 @Module({
   imports: [
@@ -22,7 +23,7 @@ import { MongooseModule } from '@nestjs/mongoose';
     EventoModule, 
     OnibusModule, 
     ParadasModule, 
-    RotasModule 
+    RotasModule, LocalizacaoModule 
   ],
   controllers: [AppController],
   providers: [AppService],

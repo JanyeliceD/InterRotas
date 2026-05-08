@@ -1,11 +1,11 @@
 import { IsNumber, IsString } from "class-validator"; 
 
 export class CreateEventoDto {
-    @IsNumber()
-    onibusId!: number;
+    @IsString()
+    onibusId!: string;
 
-    @IsNumber()
-    paradaId!: number;
+    @IsString()
+    paradaId!: string;
 
     @IsString()
     timestamp!: string;

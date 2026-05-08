@@ -1,66 +1,33 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { ParadasService } from 'src/paradas/paradas.service';
-import { Parada } from 'src/paradas/paradas.service';
+import { Model } from 'mongoose';
+import { InjectModel } from '@nestjs/mongoose';
 
-export type Rota = {
-  id: number;
-  nome: string;
-  paradas: Parada[];
-  idOnibus: number;
-  motorista: string;
-  origem: Parada;
-  destino: Parada;
-  horarioEmbarque?: string;
-};
+import { Rota, RotaDocument } from 'src/schemas/rota.schema';
 
 
 @Injectable()
 export class RotasService {
-  private rotas: Rota[];
-  
 
-  constructor(private paradasService: ParadasService) {
-    const paradas = this.paradasService.getAll();
-    
+  constructor(
+    @InjectModel(Rota.name) private rotaModel: Model<RotaDocument>
+  ) {}
 
-    this.rotas = [
-      {
-        id: 1,
-        nome: 'Rota 1',
-
-        paradas: paradas, 
-
-        idOnibus: 1,
-        motorista: 'João Silva',
-
-        origem: paradas[0],
-        destino: paradas[paradas.length - 1],
-
-        horarioEmbarque: '08:00',
-      },
-    ];
+  async listar() {
+    return this.rotaModel.find();
   }
 
-  listar() {
-    return this.rotas;
-  }
+  async buscarPorId(id: string) {
+    const rota = await this.rotaModel.findById(id);
 
-  buscarPorId(id: number) {
-    const rota = this.rotas.find(r => r.id === id);
     if (!rota) {
       throw new NotFoundException('Rota não encontrada');
     }
+
     return rota;
   }
 
-  criar(dados: Omit<Rota, 'id'>) {
-    const novoId = this.rotas.length > 0 
-      ? Math.max(...this.rotas.map(r => r.id)) + 1 
-      : 1;
-
-    const novaRota: Rota = { id: novoId, ...dados };
-    this.rotas.push(novaRota);
-
-    return novaRota;
+  async criar(dados: Omit<Rota, 'id'>) {
+    const novaRota = new this.rotaModel(dados);
+    return novaRota.save();
   }
 }
