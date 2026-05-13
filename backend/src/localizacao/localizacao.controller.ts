@@ -10,4 +10,5 @@ export class LocalizacaoController {
   receber(@Body() body: CreateLocalizacaoDto) {
     return this.localizacaoService.processarLocalizacao(body);
   }
+  
 }
