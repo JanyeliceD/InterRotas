@@ -1,5 +1,5 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { HydratedDocument } from 'mongoose';
+import mongoose, { HydratedDocument } from 'mongoose';
 
 export type OnibusDocument = HydratedDocument<Onibus>;
 
@@ -11,8 +11,12 @@ export class Onibus {
     @Prop({ required: true })
     modelo!: string;
 
-    @Prop({ required: true })
-    idRota!: string;
+    @Prop({ 
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Rota',
+        required: true 
+    })
+    idRota!: mongoose.Types.ObjectId;
 }
 
 export const OnibusSchema = SchemaFactory.createForClass(Onibus);

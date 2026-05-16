@@ -1,6 +1,15 @@
-import {BadRequestException, Controller, Get, Param, Post,Body} from '@nestjs/common';
+import {
+    Controller, 
+    Get, 
+    Param, 
+    Post,
+    Body,
+    Patch,
+    Delete 
+} from '@nestjs/common';
 import {RotasService} from './rotas.service';
 import { CreateRotaDto } from './dto/create-rota.dto';
+import { UpdateRotaDto } from './dto/update-rota.dtp';
 
 @Controller('rotas')
 export class RotasController {
@@ -17,8 +26,18 @@ export class RotasController {
     }   
 
     @Post()
-      criar(@Body() body: CreateRotaDto) {
+      criar(@Body() body: CreateRotaDto){
         return this.rotasService.criar(body);
       }
+
+    @Patch(':id')
+    atualizar(@Param('id') id: string, @Body() body: UpdateRotaDto) {
+        return this.rotasService.atualizar(id, body);
+    }
+
+    @Delete(':id')
+    remover(@Param('id') id: string) {
+        return this.rotasService.remover(id);
+    }
 
 }

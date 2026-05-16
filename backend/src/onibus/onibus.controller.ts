@@ -1,6 +1,15 @@
-import { Controller, Get, Post, Param, Body } from '@nestjs/common';
+import { 
+    Controller, 
+    Get, 
+    Post, 
+    Delete,
+    Param, 
+    Patch,
+    Body 
+} from '@nestjs/common';
 import { OnibusService } from './onibus.service';
 import { CreateOnibusDto } from './dto/create-onibus.dto';
+import { UpdateOnibusDto } from './dto/update-onibus.dto';
 
 @Controller('onibus')
 export class OnibusController {
@@ -19,5 +28,15 @@ export class OnibusController {
     @Post()
     criar(@Body() data: CreateOnibusDto) {
         return this.onibusService.criar(data);
+    }
+
+    @Patch(':id')
+    atualizar(@Param('id') id: string, @Body() data: UpdateOnibusDto) {
+        return this.onibusService.atualizar(id, data);
+    }
+
+    @Delete(':id')
+    remover(@Param('id') id: string) {
+        return this.onibusService.remover(id);
     }
 }
