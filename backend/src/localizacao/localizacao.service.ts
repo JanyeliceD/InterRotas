@@ -1,10 +1,11 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { Model } from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
 import mongoose from 'mongoose';
 
 import { Parada, ParadaDocument } from 'src/schemas/parada.schemas';
 import { Evento, EventoDocument } from 'src/schemas/evento.schema';
+import { Localizacao, LocalizacaoDocument } from 'src/schemas/localizacao.schemas';
 import { CreateLocalizacaoDto } from './dto/create-localizacao.dto';
 
 @Injectable()
@@ -12,6 +13,7 @@ export class LocalizacaoService {
     constructor(
         @InjectModel(Parada.name) private paradaModel: Model<ParadaDocument>,
         @InjectModel(Evento.name) private eventoModel: Model<EventoDocument>,
+        @InjectModel(Localizacao.name) private localizacaoModel: Model<Localizacao>,
     ) {}
 
     calcularDistancia(lat1: number, lon1: number, lat2: number, lon2: number): number {
@@ -30,6 +32,12 @@ export class LocalizacaoService {
 
     async processarLocalizacao(dados: CreateLocalizacaoDto) {
         const { onibusId, latitude, longitude } = dados;
+
+        await this.localizacaoModel.create({
+            onibusId: new mongoose.Types.ObjectId(onibusId),
+            latitude,
+            longitude,
+        });
 
         const paradas = await this.paradaModel.find();
 
@@ -71,5 +79,13 @@ export class LocalizacaoService {
     }
 
     return { message: 'Nenhuma parada detectada' };
+    }
+
+    async buscarUltimaLocalizacao(onibusId: string) {
+        return this.localizacaoModel
+            .findOne({ 
+                onibusId: new mongoose.Types.ObjectId(onibusId)
+            })
+            .sort({ timestamp: -1 });
     }
 }

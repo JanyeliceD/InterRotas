@@ -9,7 +9,7 @@ export class Parada {
     nome!: string;
 
     @Prop({ required: true })
-    local!: Array<string>;
+    endereco!: string;
 
     @Prop({ required: true })
     latitude!: number;

@@ -1,4 +1,10 @@
-import { Controller, Post, Body } from '@nestjs/common';
+import { 
+  Controller, 
+  Post, 
+  Body,
+  Get,
+  Param
+} from '@nestjs/common';
 import { LocalizacaoService } from './localizacao.service';
 import { CreateLocalizacaoDto } from './dto/create-localizacao.dto';
 
@@ -11,4 +17,8 @@ export class LocalizacaoController {
     return this.localizacaoService.processarLocalizacao(body);
   }
   
+  @Get('onibus/:onibusId')
+  buscarUltima(@Param('onibusId') onibusId: string) {
+    return this.localizacaoService.buscarUltimaLocalizacao(onibusId);
+  }
 }

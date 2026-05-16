@@ -1,12 +1,16 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { HydratedDocument } from 'mongoose';
+import mongoose, { HydratedDocument } from 'mongoose';
 
 export type LocalizacaoDocument = HydratedDocument<Localizacao>;
 
-@Schema()
+@Schema({ timestamps: true })
 export class Localizacao {
-    @Prop({ required: true })
-    onibusId!: string;
+    @Prop({
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Onibus',
+        required: true
+    })
+    onibusId!: mongoose.Types.ObjectId;
 
     @Prop({ required: true })
     latitude!: number;

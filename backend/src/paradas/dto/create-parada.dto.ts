@@ -1,15 +1,16 @@
 import { IsNotEmpty, IsNumber, IsString, IsArray, Min,Max ,ValidateNested} from 'class-validator';
-import { LocalDto } from './create-local.dto';
-import { Type } from 'class-transformer';
+//import { LocalDto } from './create-local.dto';
+//import { Type } from 'class-transformer';
 export class CreateParadaDto {
     @IsString({ message: "Nome é obrigatório" })
     @IsNotEmpty({ message: "Nome não pode ser vazio" })
     nome!: string;
 
-    @ValidateNested()
-    @Type(() => LocalDto)
-    @IsNotEmpty({ message: "Local não pode ser vazio" })
-    local!: LocalDto;
+    //@ValidateNested()
+    //@Type(() => LocalDto)
+    @IsString({ message: "Endereço é obrigatório" })
+    @IsNotEmpty({ message: "Endereço não pode ser vazio" })
+    endereco!: string;
 
     @IsNumber( {},{ message: "Latitude é obrigatória" })
     @Min(-90,{ message: "Latitude mínima é -90 " })

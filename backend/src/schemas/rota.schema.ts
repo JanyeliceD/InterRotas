@@ -1,12 +1,16 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { HydratedDocument } from 'mongoose';
+import mongoose, { HydratedDocument } from 'mongoose';
 
 export type RotaDocument = HydratedDocument<Rota>;
 
 @Schema()
 export class Rota {
-    @Prop({ required: true })
-    idOnibus!: string;
+    @Prop({ 
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Onibus',
+        required: true 
+    })
+    idOnibus!: mongoose.Types.ObjectId;
 
     @Prop({ required: true })
     nome!: string;
@@ -14,14 +18,20 @@ export class Rota {
     @Prop({ required: true })
     motorista!: string;
 
-    @Prop({ required: true })
-    paradas!: Array<string>;
+    @Prop({
+        type: [{
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'Parada'
+        }],
+        required: true
+    })
+    paradas!: mongoose.Types.ObjectId[];
 
     @Prop({ required: true })
-    origem!: Array<string>;
+    origem!: string;
 
     @Prop({ required: true })
-    destino!: Array<string>;
+    destino!: string;
 }
 
 export const RotaSchema = SchemaFactory.createForClass(Rota);
