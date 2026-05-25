@@ -3,7 +3,7 @@ import { useNavigation } from '@react-navigation/native';
 import { RootStackParamList } from '../../navigation/RootNavigator';
 
 import { Pressable, Text, View, TextInput, Alert } from 'react-native';
-import { styles } from './styles';
+import { styles } from './styles'; 
 import { useState } from 'react';
 
 type DadosLogin = {
@@ -25,9 +25,15 @@ function validarLogin(dados: DadosLogin): LoginErrors {
     return erros;
 }
 
-type NavigationProps  = NativeStackNavigationProp<RootStackParamList, 'Login'>;
+// ⚠️ IMPORTANTE: Certifique-se de que 'AdminHome' e 'MotoristaHome' (ou os nomes que escolher) 
+// estejam cadastrados dentro do seu RootStackParamList no arquivo RootNavigator!
+type NavigationProps = NativeStackNavigationProp<RootStackParamList, 'Login'>;
 
-export default function LoginScreen() {
+interface LoginScreenProps {
+    onLoginSuccess: (role: 'admin' | 'motorista') => void;
+}
+
+export default function LoginScreen({ onLoginSuccess }: LoginScreenProps) {
   const navigation = useNavigation<NavigationProps>();
 
   const [login, setLogin] = useState<DadosLogin>({
@@ -41,29 +47,49 @@ export default function LoginScreen() {
     const errosEncontrados = validarLogin(login);
     setErros(errosEncontrados);
 
-    if (Object.keys(errosEncontrados).length > 0) return;
+    if (Object.keys(errosEncontrados).length > 0) {
+        Alert.alert('Erro', 'Por favor, preencha todos os campos.');
+        return;
+    }
 
-    if (login.usuario === 'admin' && login.senha === 'admin321') {
-        navigation.navigate('App');
+    const emailLimpo = login.usuario.trim().toLowerCase();
+
+    // LÓGICA DE DIRECIONAMENTO POR PERFIL:
+    if (emailLimpo === 'admin@.com' && login.senha === '123456') {
+         navigation.navigate('AdminHome'); 
+        onLoginSuccess('admin');
+
+    } else if (emailLimpo === 'motorista@.com' && login.senha === '123456') {
+       
+        navigation.navigate('MotoristaHome'); 
+         onLoginSuccess('motorista');
+        
     } else {
-        Alert.alert('Credenciais inválidas!');
+        Alert.alert('Dados incorretos', 'Informe as credenciais corretamente.');
     }
   }
 
   return (
     <View style={styles.container}>
-        <Text style={styles.titulo}>Login</Text>
+        <View>
+            <Text style={styles.titulo}>InterRotas</Text>
+            <Text style={styles.titulo}>Login</Text>
+            <Text>Painel corporativo de Telemetria</Text>
+        </View>
 
+        <Text>E-mail:</Text>
         <TextInput
-        placeholder="Usuário"
+        placeholder="Digite seu email..."
         value={login.usuario}
         onChangeText={(texto) => setLogin({...login, usuario: texto})}
+        keyboardType="email-address"
         style={styles.input}
         />
         {erros.usuario && <Text style={{ color: 'red' }}>{erros.usuario}</Text>}
 
+        <Text>Senha:</Text>
         <TextInput
-        placeholder="Senha"
+        placeholder="*********"
         value={login.senha}
         onChangeText={(texto) => setLogin({...login, senha: texto})}
         secureTextEntry
