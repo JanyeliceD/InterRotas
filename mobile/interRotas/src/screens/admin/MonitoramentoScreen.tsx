@@ -1,6 +1,6 @@
 import { View, Text } from 'react-native';
 
-export function MonitoramentoScreen() {
+export default function MonitoramentoScreen() {
   return (
     <View>
       <Text>Monitoramento</Text>

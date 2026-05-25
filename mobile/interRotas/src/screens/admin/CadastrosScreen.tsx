@@ -1,6 +1,6 @@
 import { View, Text } from 'react-native';
 
-export function CadastrosScreen() {
+export default function CadastrosScreen() {
   return (
     <View>
       <Text>Cadastros</Text>

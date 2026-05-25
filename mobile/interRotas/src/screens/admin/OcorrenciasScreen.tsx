@@ -1,6 +1,6 @@
 import { View, Text } from 'react-native';
 
-export function OcorrenciasScreen() {
+export default function OcorrenciasScreen() {
   return (
     <View>
       <Text>Ocorrências</Text>

@@ -1,6 +1,6 @@
 import { View, Text } from 'react-native';
 
-export function AlertasScreen() {
+export default function AlertasScreen() {
   return (
     <View>
       <Text>Alertas</Text>

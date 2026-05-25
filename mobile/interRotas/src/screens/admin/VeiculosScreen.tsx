@@ -1,6 +1,6 @@
 import { View, Text } from 'react-native';
 
-export function VeiculosScreen() {
+export default function VeiculosScreen() {
   return (
     <View>
       <Text>Veículos</Text>
