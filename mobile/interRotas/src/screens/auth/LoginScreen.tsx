@@ -3,7 +3,7 @@ import { useNavigation } from '@react-navigation/native';
 import { RootStackParamList } from '../../navigation/RootNavigator';
 
 import { Pressable, Text, View, TextInput, Alert } from 'react-native';
-import { styles } from './styles'; 
+import { styles } from './styles';
 import { useState } from 'react';
 
 type DadosLogin = {
@@ -25,15 +25,9 @@ function validarLogin(dados: DadosLogin): LoginErrors {
     return erros;
 }
 
-// ⚠️ IMPORTANTE: Certifique-se de que 'AdminHome' e 'MotoristaHome' (ou os nomes que escolher) 
-// estejam cadastrados dentro do seu RootStackParamList no arquivo RootNavigator!
-type NavigationProps = NativeStackNavigationProp<RootStackParamList, 'Login'>;
+type NavigationProps  = NativeStackNavigationProp<RootStackParamList, 'Login'>;
 
-interface LoginScreenProps {
-    onLoginSuccess: (role: 'admin' | 'motorista') => void;
-}
-
-export default function LoginScreen({ onLoginSuccess }: LoginScreenProps) {
+export default function LoginScreen() {
   const navigation = useNavigation<NavigationProps>();
 
   const [login, setLogin] = useState<DadosLogin>({
@@ -47,55 +41,44 @@ export default function LoginScreen({ onLoginSuccess }: LoginScreenProps) {
     const errosEncontrados = validarLogin(login);
     setErros(errosEncontrados);
 
-    if (Object.keys(errosEncontrados).length > 0) {
-        Alert.alert('Erro', 'Por favor, preencha todos os campos.');
-        return;
-    }
+    if (Object.keys(errosEncontrados).length > 0) return;
 
-    const emailLimpo = login.usuario.trim().toLowerCase();
+    const usuarioLimpo = login.usuario.trim().toLowerCase();
 
-    // LÓGICA DE DIRECIONAMENTO POR PERFIL:
-    if (emailLimpo === 'admin@.com' && login.senha === '123456') {
-         navigation.navigate('AdminHome'); 
-        onLoginSuccess('admin');
-
-    } else if (emailLimpo === 'motorista@.com' && login.senha === '123456') {
-       
+     if (usuarioLimpo === 'admin' && login.senha === 'admin321') {
+        navigation.navigate('Monitoramento'); 
+        
+     } else if (usuarioLimpo === 'motorista' && login.senha === 'mota123') {
         navigation.navigate('MotoristaHome'); 
-         onLoginSuccess('motorista');
         
     } else {
-        Alert.alert('Dados incorretos', 'Informe as credenciais corretamente.');
+        Alert.alert('Credenciais inválidas!', 'Usuário ou senha incorretos.');
     }
   }
 
   return (
     <View style={styles.container}>
-        <View>
-            <Text style={styles.titulo}>InterRotas</Text>
-            <Text style={styles.titulo}>Login</Text>
-            <Text>Painel corporativo de Telemetria</Text>
-        </View>
+        <Text style={styles.titulo}>Login</Text>
 
-        <Text>E-mail:</Text>
         <TextInput
-        placeholder="Digite seu email..."
+        placeholder="Usuário"
+        placeholderTextColor="#94A3B8"
         value={login.usuario}
         onChangeText={(texto) => setLogin({...login, usuario: texto})}
-        keyboardType="email-address"
         style={styles.input}
+        autoCapitalize="none"
         />
-        {erros.usuario && <Text style={{ color: 'red' }}>{erros.usuario}</Text>}
+        {erros.usuario && <Text style={{ color: 'red', marginBottom: 8, marginLeft: 4 }}>{erros.usuario}</Text>}
 
-        <Text>Senha:</Text>
         <TextInput
-        placeholder="*********"
+        placeholder="Senha"
+        placeholderTextColor="#94A3B8"
         value={login.senha}
         onChangeText={(texto) => setLogin({...login, senha: texto})}
         secureTextEntry
         style={styles.input}
         />
-        {erros.senha && <Text style={{ color: 'red' }}>{erros.senha}</Text>}
+        {erros.senha && <Text style={{ color: 'red', marginBottom: 8, marginLeft: 4 }}>{erros.senha}</Text>}
 
         <Text style={styles.textoSenha}>Esqueceu a senha?</Text>
 
