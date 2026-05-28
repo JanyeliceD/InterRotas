@@ -7,7 +7,7 @@ import DashboardScreen from '../screens/admin/DashboardSCreen';
 import MonitoramentoScreen from '../screens/admin/MonitoramentoScreen';
 import { VeiculosScreen } from '../screens/admin/VeiculosScreen';
 import { AlertasScreen } from '../screens/admin/AlertasScreen';
-import { CadastrosScreen } from '../screens/admin/CadastrosScreen';
+import CadastrosScreen from '../screens/admin/CadastrosScreen';
 
 export type RootTabParamList = {
     Dashboard: undefined;

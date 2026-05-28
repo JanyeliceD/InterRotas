@@ -5,6 +5,10 @@ import { AppDrawer } from './AppDrawer';
 import DashboardScreen from '../screens/admin/DashboardSCreen';
 import HomeScreen from '../screens/motorista/HomeScreen';
 import RegistrarOcorrenciaScreen from '../screens/motorista/RegistrarOcorrenciaScreen';
+import CadastrarOnibusScreen from '../screens/admin/CadastrarOnibusScreen'; '../screens/admin/CadastrarOnibusScreen';
+import CadastrarRotaScreen from '../screens/admin/CadastrarRotaScreen';
+import CadastrarMotoristaScreen from '../screens/admin/CadastrarMotoristaScreen';
+import CadastrosScreen from '../screens/admin/CadastrosScreen';
 import TabNavigator from './TabNavigator';
 
 export type RootStackParamList = {
@@ -14,6 +18,10 @@ export type RootStackParamList = {
     MotoristaHome: undefined; 
     Monitoramento: undefined;
     RegistrarOcorrencia: undefined;
+    CadastrarOnibus: undefined;
+    CadastrarRota: undefined;
+    CadastrarMotorista: undefined;
+    Cadastros: undefined;
 };
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
@@ -52,6 +60,26 @@ export function RootNavigator() {
           name="RegistrarOcorrencia" 
           component={RegistrarOcorrenciaScreen} 
           options={{ title: 'Registrar Ocorrência' }} 
+        />
+        <Stack.Screen 
+          name="CadastrarOnibus" 
+          component={CadastrarOnibusScreen} 
+          options={{ title: 'Cadastrar Ônibus' }} 
+        />
+        <Stack.Screen 
+          name="CadastrarRota" 
+          component={CadastrarRotaScreen} 
+          options={{ title: 'Cadastrar Rota' }} 
+        />
+        <Stack.Screen 
+          name="CadastrarMotorista" 
+          component={CadastrarMotoristaScreen} 
+          options={{ title: 'Cadastrar Motorista' }} 
+        />
+        <Stack.Screen 
+          name="Cadastros" 
+          component={CadastrosScreen} 
+          options={{ title: 'Cadastros' }} 
         />
       </Stack.Navigator>
     </NavigationContainer>

@@ -5,33 +5,67 @@ import {
   TouchableOpacity,
 } from 'react-native';
 
+import { RouteProp, useRoute } from '@react-navigation/native';
+
+type Ocorrencia = {
+  placa: string;
+  tipo: string;
+  observacao: string;
+  horario: string;
+};
+
+type HomeRouteProp = RouteProp<
+  { params: { ultimaOcorrencia?: Ocorrencia } },
+  'params'
+>;
+
 export default function HomeScreen({
   navigation,
 }: any) {
+
+  const route = useRoute<HomeRouteProp>();
+
+const ultimaOcorrencia = route.params?.ultimaOcorrencia;
+
   return (
     <View style={styles.container}>
+
       <Text style={styles.title}>
         Área do Motorista
       </Text>
 
-      <View style={styles.statusCard}>
-        <Text style={styles.statusLabel}>
-          Status Atual
-        </Text>
-
-        <Text style={styles.status}>
-          Em operação
-        </Text>
-      </View>
-
-      <View style={styles.ocorrenciaCard}>
-        <Text style={styles.ocorrenciaTitle}>
+      <View style={styles.card}>
+        <Text style={styles.cardTitle}>
           Última ocorrência
         </Text>
 
-        <Text style={styles.ocorrenciaText}>
-          Nenhuma ocorrência registrada.
-        </Text>
+        {ultimaOcorrencia ? (
+          <>
+            <Text style={styles.text}>
+              Tipo: {ultimaOcorrencia.tipo}
+            </Text>
+
+            <Text style={styles.text}>
+              Ônibus: {ultimaOcorrencia.placa}
+            </Text>
+
+            <Text style={styles.text}>
+              Observação:
+              {' '}
+              {ultimaOcorrencia.observacao || 'Nenhuma'}
+            </Text>
+
+            <Text style={styles.text}>
+              Horário:
+              {' '}
+              {ultimaOcorrencia.horario}
+            </Text>
+          </>
+        ) : (
+          <Text style={styles.text}>
+            Nenhuma ocorrência registrada.
+          </Text>
+        )}
       </View>
 
       <TouchableOpacity
@@ -44,6 +78,7 @@ export default function HomeScreen({
           Registrar ocorrência
         </Text>
       </TouchableOpacity>
+
     </View>
   );
 }
@@ -64,41 +99,24 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
 
-  statusCard: {
-    backgroundColor: '#0F172A',
-    padding: 20,
-    borderRadius: 10,
-    marginBottom: 16,
-  },
-
-  statusLabel: {
-    color: '#94A3B8',
-    fontSize: 14,
-  },
-
-  status: {
-    color: '#22C55E',
-    fontSize: 22,
-    fontWeight: 'bold',
-    marginTop: 8,
-  },
-
-  ocorrenciaCard: {
+  card: {
     backgroundColor: '#0F172A',
     padding: 20,
     borderRadius: 10,
     marginBottom: 30,
   },
 
-  ocorrenciaTitle: {
+  cardTitle: {
     color: '#FFF',
-    fontSize: 16,
+    fontSize: 18,
     fontWeight: 'bold',
-    marginBottom: 10,
+    marginBottom: 12,
   },
 
-  ocorrenciaText: {
+  text: {
     color: '#CBD5E1',
+    marginBottom: 6,
+    fontSize: 15,
   },
 
   button: {

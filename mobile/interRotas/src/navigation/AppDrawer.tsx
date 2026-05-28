@@ -1,7 +1,7 @@
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { createDrawerNavigator } from '@react-navigation/drawer';
 import { AppTabs } from './AppTabs';
-import { OcorrenciasScreen } from '../screens/admin/OcorrenciasScreen';
+import OcorrenciasScreen from '../screens/admin/OcorrenciasScreen';
 
 export type RootDrawerParamList = {
   PainelPrincipal: undefined;

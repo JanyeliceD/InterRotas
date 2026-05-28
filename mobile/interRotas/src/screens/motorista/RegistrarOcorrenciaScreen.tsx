@@ -19,12 +19,19 @@ const tiposOcorrencia = [
   'Emergência',
 ];
 
-export default function RegistrarOcorrenciaScreen() {
+export default function RegistrarOcorrenciaScreen({
+  navigation,
+}: any) {
+
   const [placa, setPlaca] = useState('');
-  const [tipoSelecionado, setTipoSelecionado] = useState('');
-  const [observacao, setObservacao] = useState('');
+  const [tipoSelecionado, setTipoSelecionado] =
+    useState('');
+
+  const [observacao, setObservacao] =
+    useState('');
 
   function enviarOcorrencia() {
+
     if (!placa || !tipoSelecionado) {
       Alert.alert(
         'Erro',
@@ -34,10 +41,14 @@ export default function RegistrarOcorrenciaScreen() {
       return;
     }
 
-    Alert.alert(
-      'Sucesso',
-      'Ocorrência enviada com sucesso.'
-    );
+    navigation.navigate('MotoristaHome', {
+    ultimaOcorrencia: {
+      placa,
+      tipo: tipoSelecionado,
+      observacao,
+      horario: new Date().toLocaleTimeString(),
+    },
+  });
 
     setPlaca('');
     setTipoSelecionado('');
@@ -46,6 +57,7 @@ export default function RegistrarOcorrenciaScreen() {
 
   return (
     <View style={styles.container}>
+
       <Text style={styles.title}>
         Registrar Ocorrência
       </Text>
@@ -64,23 +76,24 @@ export default function RegistrarOcorrenciaScreen() {
 
       <FlatList
         data={tiposOcorrencia}
-        numColumns={2}
         keyExtractor={(item) => item}
+        numColumns={2}
         columnWrapperStyle={{
           justifyContent: 'space-between',
         }}
         renderItem={({ item }) => (
           <TouchableOpacity
             style={[
-              styles.ocorrenciaButton,
+              styles.tipoButton,
+
               tipoSelecionado === item &&
-                styles.ocorrenciaSelecionada,
+                styles.tipoSelecionado,
             ]}
             onPress={() =>
               setTipoSelecionado(item)
             }
           >
-            <Text style={styles.ocorrenciaText}>
+            <Text style={styles.tipoText}>
               {item}
             </Text>
           </TouchableOpacity>
@@ -105,6 +118,7 @@ export default function RegistrarOcorrenciaScreen() {
           Enviar ocorrência
         </Text>
       </TouchableOpacity>
+
     </View>
   );
 }
@@ -117,10 +131,10 @@ const styles = StyleSheet.create({
   },
 
   title: {
-    fontSize: 22,
-    fontWeight: 'bold',
     color: '#FFF',
-    marginBottom: 20,
+    fontSize: 24,
+    fontWeight: 'bold',
+    marginBottom: 24,
   },
 
   input: {
@@ -133,11 +147,11 @@ const styles = StyleSheet.create({
 
   label: {
     color: '#CBD5E1',
-    marginBottom: 10,
     fontSize: 16,
+    marginBottom: 12,
   },
 
-  ocorrenciaButton: {
+  tipoButton: {
     backgroundColor: '#0F172A',
     width: '48%',
     padding: 14,
@@ -146,12 +160,12 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
 
-  ocorrenciaSelecionada: {
+  tipoSelecionado: {
     borderWidth: 2,
     borderColor: '#3B82F6',
   },
 
-  ocorrenciaText: {
+  tipoText: {
     color: '#FFF',
     textAlign: 'center',
   },
@@ -161,17 +175,17 @@ const styles = StyleSheet.create({
     color: '#FFF',
     borderRadius: 8,
     padding: 14,
-    marginTop: 10,
     height: 100,
     textAlignVertical: 'top',
+    marginTop: 12,
   },
 
   button: {
-    backgroundColor: '#1D4ED8',
+    backgroundColor: '#2563EB',
     padding: 16,
     borderRadius: 8,
     alignItems: 'center',
-    marginTop: 20,
+    marginTop: 24,
   },
 
   buttonText: {
