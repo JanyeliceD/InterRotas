@@ -19,7 +19,7 @@ export default function DashboardScreen() {
 
    
       <View style={styles.searchContainer}>
-        <Text style={styles.title}>Monitoramento de Frota</Text>
+        <Text style={styles.title}>Painel</Text>
         <TextInput
         style={styles.searchInput}
         placeholder='Buscar rota ou linha...'

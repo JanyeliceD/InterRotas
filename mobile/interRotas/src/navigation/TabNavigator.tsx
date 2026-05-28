@@ -5,14 +5,8 @@ import {View, Text} from 'react-native';
 import CadastrosScreen from "../screens/admin/CadastrosScreen";
 import MonitoramentoScreen  from "../screens/admin/MonitoramentoScreen";
 import  DashboardScreen  from "../screens/admin/DashboardSCreen";
+import AlertasScreen from "../screens/admin/AlertasScreen";
 
-function PerfilScreen(){
-    return (
-    <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: '#0F172A' }}>
-      <Text style={{ color: '#FFF', fontSize: 18 }}>👤 Tela de Perfil do Admin</Text>
-    </View>
-  );
-}
 
 const Tab = createBottomTabNavigator();
 
@@ -40,14 +34,6 @@ export default function TabNavigator() {
             options={{ tabBarLabel: 'Frota', tabBarIcon: ({ color }) => <Text style={{ color, fontSize: 20 }}>🚌</Text>,
         }} />
 
-        <Tab.Screen 
-        name="Perfil" 
-        component={PerfilScreen} 
-        options={{
-          tabBarLabel: 'Meu Perfil',
-          tabBarIcon: ({ color }) => <Text style={{ color, fontSize: 20 }}>👤</Text>,
-        }}
-      />
       <Tab.Screen
       name = "Monitoramento"
       component={MonitoramentoScreen}
@@ -62,6 +48,14 @@ export default function TabNavigator() {
         options={{
           tabBarLabel: 'Cadastros',
           tabBarIcon: ({ color }) => <Text style={{ color, fontSize: 20 }}>📝</Text>,
+        }}
+      />
+      <Tab.Screen 
+        name="Alertas" 
+        component={AlertasScreen} 
+        options={{
+          tabBarLabel: 'Alertas',
+          tabBarIcon: ({ color }) => <Text style={{ color, fontSize: 20 }}>⚠️</Text>,
         }}
       />
         </Tab.Navigator>

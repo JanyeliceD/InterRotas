@@ -78,17 +78,12 @@ export default function LoginScreen() {
         secureTextEntry
         style={styles.input}
         />
-        {erros.senha && <Text style={{ color: 'red', marginBottom: 8, marginLeft: 4 }}>{erros.senha}</Text>}
-
-        <Text style={styles.textoSenha}>Esqueceu a senha?</Text>
+        {erros.senha && <Text style={{ color: 'red', marginBottom: 8, marginLeft: 4 }}>{erros.senha}</Text>}  
 
       <Pressable style={styles.botao} onPress={entrar}>
         <Text style={styles.botaoTexto}>Entrar</Text>
       </Pressable>
 
-      <Text style={styles.cadastro}>
-        Não possui cadastro? <Text style={styles.cadastrar}>Cadastrar</Text>
-      </Text>
-    </View>
+         </View>
   );
 }

@@ -39,7 +39,7 @@ export default function CadastrarRotaScreen() {
   return (
     <View style={styles.container}>
       <Text style={styles.title}>
-        Cadastro de Rota
+        Cadastrar de Rota
       </Text>
 
       <TextInput
