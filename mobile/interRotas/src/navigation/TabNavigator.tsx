@@ -2,6 +2,7 @@ import React from "react";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import {View, Text} from 'react-native';
 
+import CadastrosScreen from "../screens/admin/CadastrosScreen";
 import MonitoramentoScreen  from "../screens/admin/MonitoramentoScreen";
 import  DashboardScreen  from "../screens/admin/DashboardSCreen";
 
@@ -54,7 +55,14 @@ export default function TabNavigator() {
           tabBarLabel: 'Monitoramento',
           tabBarIcon: ({ color }) => <Text style={{ color, fontSize: 20 }}>📍</Text>,
         }}
-        
+      />
+      <Tab.Screen
+      name = "Cadastros"
+      component={CadastrosScreen}
+        options={{
+          tabBarLabel: 'Cadastros',
+          tabBarIcon: ({ color }) => <Text style={{ color, fontSize: 20 }}>📝</Text>,
+        }}
       />
         </Tab.Navigator>
     )
