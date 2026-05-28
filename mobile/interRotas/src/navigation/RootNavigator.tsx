@@ -51,7 +51,7 @@ export function RootNavigator() {
         <Stack.Screen 
           name="RegistrarOcorrencia" 
           component={RegistrarOcorrenciaScreen} 
-          options={{ title: 'Registrar OcorrÊncia' }} 
+          options={{ title: 'Registrar Ocorrência' }} 
         />
       </Stack.Navigator>
     </NavigationContainer>
