@@ -1,7 +1,7 @@
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { createDrawerNavigator } from '@react-navigation/drawer';
-import { AppTabs } from './AppTabs';
 import OcorrenciasScreen from '../screens/admin/OcorrenciasScreen';
+import TabNavigator from './TabNavigator';
 
 export type RootDrawerParamList = {
   PainelPrincipal: undefined;
@@ -15,10 +15,10 @@ export function AppDrawer() {
     <Drawer.Navigator
       initialRouteName="PainelPrincipal"
       screenOptions={({ route }) => ({
-        headerStyle: { backgroundColor: '#1D2A62' },
-        headerTintColor: '#ededed',
-        drawerActiveTintColor: '#1D2A62',
-        drawerInactiveTintColor: '#334155',
+        headerStyle: { backgroundColor: '#1E40AF' },
+        headerTintColor: '#F1F5F9',
+        drawerActiveTintColor: '#1E40AF',
+        drawerInactiveTintColor: '#64748b',
         drawerIcon: ({ focused, color, size }) => (
           <Ionicons
             name={
@@ -34,7 +34,7 @@ export function AppDrawer() {
     >
       <Drawer.Screen
         name="PainelPrincipal"
-        component={AppTabs}
+        component={TabNavigator}
         options={{ title: 'Painel', headerShown: false }}
       />
       <Drawer.Screen

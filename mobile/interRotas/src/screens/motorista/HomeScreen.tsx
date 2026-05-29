@@ -15,17 +15,13 @@ type Ocorrencia = {
 };
 
 type HomeRouteProp = RouteProp<
-  { params: { ultimaOcorrencia?: Ocorrencia } },
-  'params'
+  { params: { ultimaOcorrencia?: Ocorrencia } }, 'params'
 >;
 
-export default function HomeScreen({
-  navigation,
-}: any) {
-
+export default function HomeScreen({ navigation }: any) {
   const route = useRoute<HomeRouteProp>();
 
-const ultimaOcorrencia = route.params?.ultimaOcorrencia;
+  const ultimaOcorrencia = route.params?.ultimaOcorrencia;
 
   return (
     <View style={styles.container}>
@@ -70,8 +66,7 @@ const ultimaOcorrencia = route.params?.ultimaOcorrencia;
 
       <TouchableOpacity
         style={styles.button}
-        onPress={() =>
-          navigation.navigate('RegistrarOcorrencia')
+        onPress={() => navigation.navigate('RegistrarOcorrencia')
         }
       >
         <Text style={styles.buttonText}>
@@ -86,13 +81,12 @@ const ultimaOcorrencia = route.params?.ultimaOcorrencia;
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#1E293B',
+    backgroundColor: '#F8FAFC',
     padding: 16,
-    justifyContent: 'center',
   },
 
   title: {
-    color: '#FFF',
+    color: '#1E40AF',
     fontSize: 26,
     fontWeight: 'bold',
     marginBottom: 30,
@@ -100,27 +94,27 @@ const styles = StyleSheet.create({
   },
 
   card: {
-    backgroundColor: '#0F172A',
+    backgroundColor: '#F1F5F9',
     padding: 20,
     borderRadius: 10,
     marginBottom: 30,
   },
 
   cardTitle: {
-    color: '#FFF',
+    color: '#1E293B',
     fontSize: 18,
     fontWeight: 'bold',
     marginBottom: 12,
   },
 
   text: {
-    color: '#CBD5E1',
+    color: '#64748B',
     marginBottom: 6,
     fontSize: 15,
   },
 
   button: {
-    backgroundColor: '#2563EB',
+    backgroundColor: '#1E40AF',
     padding: 16,
     borderRadius: 10,
     alignItems: 'center',

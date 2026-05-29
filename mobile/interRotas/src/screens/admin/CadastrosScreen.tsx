@@ -10,41 +10,33 @@ export default function CadastrosScreen({
 }: any) {
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>
+      <Text style={styles.titulo}>
         Área de Cadastros
       </Text>
 
       <TouchableOpacity
         style={styles.card}
-        onPress={() =>
-          navigation.navigate('CadastrarOnibus')
-        }
+        onPress={() => navigation.navigate('CadastrarOnibus')}
       >
-        <Text style={styles.cardTitle}>
+        <Text style={styles.cardTitulo}>
           Cadastrar Ônibus
         </Text>
       </TouchableOpacity>
 
       <TouchableOpacity
         style={styles.card}
-        onPress={() =>
-          navigation.navigate('CadastrarRota')
-        }
+        onPress={() => navigation.navigate('CadastrarRota')}
       >
-        <Text style={styles.cardTitle}>
+        <Text style={styles.cardTitulo}>
           Cadastrar Rota
         </Text>
       </TouchableOpacity>
 
       <TouchableOpacity
         style={styles.card}
-        onPress={() =>
-          navigation.navigate(
-            'CadastrarMotorista'
-          )
-        }
+        onPress={() => navigation.navigate('CadastrarMotorista')}
       >
-        <Text style={styles.cardTitle}>
+        <Text style={styles.cardTitulo}>
           Cadastrar Motorista
         </Text>
       </TouchableOpacity>
@@ -55,26 +47,28 @@ export default function CadastrosScreen({
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#1E293B',
+    backgroundColor: '#F8FAFC',
     padding: 16,
   },
 
-  title: {
-    color: '#FFF',
+  titulo: {
+    color: '#1E40AF',
     fontSize: 24,
     fontWeight: 'bold',
     marginBottom: 30,
   },
 
   card: {
-    backgroundColor: '#0F172A',
+    backgroundColor: '#F1F5F9',
     padding: 20,
     borderRadius: 10,
     marginBottom: 16,
+    borderColor: '#1E40AF',
+    borderWidth: 1,
   },
 
-  cardTitle: {
-    color: '#FFF',
+  cardTitulo: {
+    color: '#1E40AF',
     fontSize: 18,
     fontWeight: '600',
   },
