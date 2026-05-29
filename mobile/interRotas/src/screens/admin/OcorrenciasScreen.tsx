@@ -101,19 +101,19 @@ export default function OcorrenciasScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#1E293B',
+    backgroundColor: '#F8FAFC',
     padding: 16,
   },
 
   title: {
-    color: '#FFF',
+    color: '#1E40AF',
     fontSize: 22,
     fontWeight: 'bold',
     marginBottom: 20,
   },
 
   card: {
-    backgroundColor: '#0F172A',
+    backgroundColor: '#F1F5F9',
     borderRadius: 10,
     padding: 16,
     marginBottom: 14,
@@ -126,7 +126,7 @@ const styles = StyleSheet.create({
   },
 
   placa: {
-    color: '#FFF',
+    color: '#1E40AF',
     fontSize: 18,
     fontWeight: 'bold',
   },
@@ -144,19 +144,19 @@ const styles = StyleSheet.create({
   },
 
   tipo: {
-    color: '#CBD5E1',
+    color: '#1E293B',
     marginTop: 12,
     fontSize: 16,
   },
 
   horario: {
-    color: '#94A3B8',
+    color: '#64748B',
     marginTop: 8,
     fontSize: 13,
   },
 
   button: {
-    backgroundColor: '#2563EB',
+    backgroundColor: '#1E40AF',
     padding: 12,
     borderRadius: 8,
     marginTop: 16,

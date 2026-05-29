@@ -46,7 +46,7 @@ export default function LoginScreen() {
     const usuarioLimpo = login.usuario.trim().toLowerCase();
 
      if (usuarioLimpo === 'admin' && login.senha === 'admin321') {
-        navigation.navigate('Monitoramento'); 
+        navigation.navigate('AppDrawer'); 
         
      } else if (usuarioLimpo === 'motorista' && login.senha === 'mota123') {
         navigation.navigate('MotoristaHome'); 

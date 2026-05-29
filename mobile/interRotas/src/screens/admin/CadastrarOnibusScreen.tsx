@@ -37,14 +37,14 @@ export default function CadastrarOnibusScreen() {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>
-        Cadastro de Ônibus
+      <Text style={styles.titulo}>
+        Cadastrar Ônibus
       </Text>
 
       <TextInput
         style={styles.input}
         placeholder="Placa"
-        placeholderTextColor="#94A3B8"
+        placeholderTextColor="#64748B"
         value={placa}
         onChangeText={setPlaca}
       />
@@ -52,15 +52,15 @@ export default function CadastrarOnibusScreen() {
       <TextInput
         style={styles.input}
         placeholder="Modelo"
-        placeholderTextColor="#94A3B8"
+        placeholderTextColor="#64748B"
         value={modelo}
         onChangeText={setModelo}
       />
 
       <TextInput
         style={styles.input}
-        placeholder="Capacidade"
-        placeholderTextColor="#94A3B8"
+        placeholder="Capacidade de passageiros"
+        placeholderTextColor="#64748B"
         keyboardType="numeric"
         value={capacidade}
         onChangeText={setCapacidade}
@@ -81,27 +81,27 @@ export default function CadastrarOnibusScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#1E293B',
+    backgroundColor: '#F8FAFC',
     padding: 16,
   },
 
-  title: {
-    color: '#FFF',
+  titulo: {
+    color: '#1E40AF',
     fontSize: 24,
     fontWeight: 'bold',
     marginBottom: 24,
   },
 
   input: {
-    backgroundColor: '#334155',
-    color: '#FFF',
+    backgroundColor: '#F1F5F9',
+    color: '#1E293B',
     borderRadius: 8,
     padding: 14,
     marginBottom: 16,
   },
 
   button: {
-    backgroundColor: '#2563EB',
+    backgroundColor: '#1E40AF',
     padding: 16,
     borderRadius: 8,
     alignItems: 'center',

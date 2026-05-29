@@ -1,52 +1,44 @@
 import { StyleSheet } from 'react-native';
 
 export const styles = StyleSheet.create({
-    container: {
-        backgroundColor: '#ededed',
-        flex: 1,
-        justifyContent: 'center',
-        alignItems: 'center',
-        padding: 20,
-        gap: 10,
-    },
-    titulo: {
-        fontSize: 24,
-        backgroundColor: '#1D2A62',
-        color: '#ededed',
-        paddingHorizontal: 32,
-        borderRadius: 8,
-        marginBottom: 12,
-    },
-    input: {
-        backgroundColor: '#B3B3B3',
-        color: '#334155',
-        paddingHorizontal: 8,
-        paddingVertical: 12,
-        borderRadius: 8,
-    },
-    textoSenha: {
-        color: '#334155',
-        textDecorationLine: 'underline',
-        marginTop: 8,
-        marginBottom: 8,
-        fontSize: 12,
-    },
-    botao: {
-        backgroundColor: '#1D2A62',
-        paddingHorizontal: 32,
-        paddingVertical: 4,
-        borderRadius: 8,
-        marginBottom: 8,
-    },
-    botaoTexto: {
-        color: '#ededed',
-        fontWeight: 'bold',
-    },
-    cadastro: {
-        color: '#334155',
-    },
-    cadastrar: {
-        textDecorationLine: 'underline',
-        color: '#1D2A62',
-    }
+  container: {
+    flex: 1,
+    backgroundColor: '#F8FAFC',
+    justifyContent: 'center',
+    paddingHorizontal: 24,
+  },
+
+  titulo: {
+    fontSize: 32,
+    fontWeight: 'bold',
+    color: '#1E40AF',
+    marginBottom: 40,
+    textAlign: 'center',
+  },
+
+  input: {
+    backgroundColor: '#F1F5F9',
+    color: '#1E293B',
+    paddingHorizontal: 16,
+    paddingVertical: 14,
+    borderRadius: 10,
+    marginBottom: 14,
+    fontSize: 16,
+    borderWidth: 1,
+    borderColor: '#334155',
+  },
+
+  botao: {
+    backgroundColor: '#1E40AF',
+    paddingVertical: 16,
+    borderRadius: 10,
+    alignItems: 'center',
+    marginTop: 8,
+  },
+
+  botaoTexto: {
+    color: '#FFFFFF',
+    fontSize: 16,
+    fontWeight: 'bold',
+  },
 });

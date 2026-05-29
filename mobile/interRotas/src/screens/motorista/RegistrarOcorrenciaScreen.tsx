@@ -19,25 +19,18 @@ const tiposOcorrencia = [
   'Emergência',
 ];
 
-export default function RegistrarOcorrenciaScreen({
-  navigation,
-}: any) {
+export default function RegistrarOcorrenciaScreen({ navigation }: any) {
 
   const [placa, setPlaca] = useState('');
-  const [tipoSelecionado, setTipoSelecionado] =
-    useState('');
-
-  const [observacao, setObservacao] =
-    useState('');
+  const [tipoSelecionado, setTipoSelecionado] = useState('');
+  const [observacao, setObservacao] = useState('');
 
   function enviarOcorrencia() {
-
     if (!placa || !tipoSelecionado) {
       Alert.alert(
         'Erro',
         'Preencha a placa e selecione uma ocorrência.'
       );
-
       return;
     }
 
@@ -126,33 +119,33 @@ export default function RegistrarOcorrenciaScreen({
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#1E293B',
+    backgroundColor: '#F8FAFC',
     padding: 16,
   },
 
   title: {
-    color: '#FFF',
+    color: '#1E40AF',
     fontSize: 24,
     fontWeight: 'bold',
     marginBottom: 24,
   },
 
   input: {
-    backgroundColor: '#334155',
-    color: '#FFF',
+    backgroundColor: '#F1F5F9',
+    color: '#1E293B',
     borderRadius: 8,
     padding: 14,
     marginBottom: 16,
   },
 
   label: {
-    color: '#CBD5E1',
+    color: '#1E293B',
     fontSize: 16,
     marginBottom: 12,
   },
 
   tipoButton: {
-    backgroundColor: '#0F172A',
+    backgroundColor: '#F1F5F9',
     width: '48%',
     padding: 14,
     borderRadius: 8,
@@ -162,17 +155,17 @@ const styles = StyleSheet.create({
 
   tipoSelecionado: {
     borderWidth: 2,
-    borderColor: '#3B82F6',
+    borderColor: '#1E40AF',
   },
 
   tipoText: {
-    color: '#FFF',
+    color: '#1E293B',
     textAlign: 'center',
   },
 
   textArea: {
-    backgroundColor: '#334155',
-    color: '#FFF',
+    backgroundColor: '#F1F5F9',
+    color: '#1E293B',
     borderRadius: 8,
     padding: 14,
     height: 100,
@@ -181,7 +174,7 @@ const styles = StyleSheet.create({
   },
 
   button: {
-    backgroundColor: '#2563EB',
+    backgroundColor: '#1E40AF',
     padding: 16,
     borderRadius: 8,
     alignItems: 'center',

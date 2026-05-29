@@ -38,14 +38,14 @@ export default function CadastrarRotaScreen() {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>
-        Cadastrar de Rota
+      <Text style={styles.titulo}>
+        Cadastrar Rota
       </Text>
 
       <TextInput
         style={styles.input}
         placeholder="Nome da rota"
-        placeholderTextColor="#94A3B8"
+        placeholderTextColor="#64748B"
         value={nome}
         onChangeText={setNome}
       />
@@ -53,7 +53,7 @@ export default function CadastrarRotaScreen() {
       <TextInput
         style={styles.input}
         placeholder="Motorista"
-        placeholderTextColor="#94A3B8"
+        placeholderTextColor="#64748B"
         value={motorista}
         onChangeText={setMotorista}
       />
@@ -61,7 +61,7 @@ export default function CadastrarRotaScreen() {
       <TextInput
         style={styles.input}
         placeholder="Origem"
-        placeholderTextColor="#94A3B8"
+        placeholderTextColor="#64748B"
         value={origem}
         onChangeText={setOrigem}
       />
@@ -69,7 +69,7 @@ export default function CadastrarRotaScreen() {
       <TextInput
         style={styles.input}
         placeholder="Destino"
-        placeholderTextColor="#94A3B8"
+        placeholderTextColor="#64748B"
         value={destino}
         onChangeText={setDestino}
       />
@@ -89,27 +89,27 @@ export default function CadastrarRotaScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#1E293B',
+    backgroundColor: '#F8FAFC',
     padding: 16,
   },
 
-  title: {
-    color: '#FFF',
+  titulo: {
+    color: '#1E40AF',
     fontSize: 24,
     fontWeight: 'bold',
     marginBottom: 24,
   },
 
   input: {
-    backgroundColor: '#334155',
-    color: '#FFF',
+    backgroundColor: '#F1F5F9',
+    color: '#1E293B',
     borderRadius: 8,
     padding: 14,
     marginBottom: 16,
   },
 
   button: {
-    backgroundColor: '#2563EB',
+    backgroundColor: '#1E40AF',
     padding: 16,
     borderRadius: 8,
     alignItems: 'center',
