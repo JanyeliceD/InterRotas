@@ -8,6 +8,7 @@ import { RotasModule } from './rotas/rotas.module';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { MongooseModule } from '@nestjs/mongoose';
 import { LocalizacaoModule } from './localizacao/localizacao.module';
+import { MotoristaModule } from './motorista/motorista.module';
 
 @Module({
   imports: [
@@ -23,7 +24,9 @@ import { LocalizacaoModule } from './localizacao/localizacao.module';
     EventoModule, 
     OnibusModule, 
     ParadasModule, 
-    RotasModule, LocalizacaoModule 
+    RotasModule, 
+    LocalizacaoModule, 
+    MotoristaModule,
   ],
   controllers: [AppController],
   providers: [AppService],

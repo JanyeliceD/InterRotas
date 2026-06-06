@@ -1,0 +1,24 @@
+import { IsNotEmpty, IsString, IsMongoId } from "class-validator";
+
+export class CreateMotoristaDto {
+    @IsString({ message: "Nome é obrigatório" })
+    @IsNotEmpty({ message: "Nome não pode ser vazio" })
+    nome!: string;
+
+    @IsString({ message: "CPF é obrigatório" })
+    @IsNotEmpty({ message: "CPF não pode ser vazio" })
+    cpf!: string;
+
+    @IsString({ message: "CNH é obrigatória" })
+    @IsNotEmpty({ message: "CNH não pode ser vazio" })
+    cnh!: string;
+
+    @IsString({ message: "Telefone é obrigatório" })
+    @IsNotEmpty({ message: "Telefone não pode ser vazio" })
+    telefone!: string;
+
+    @IsString({ message: "ID do Ônibus é obrigatório" })
+    @IsNotEmpty({ message: "ID do Ônibus não pode ser vazio" })
+    @IsMongoId({ message: "ID do Ônibus deve ser um ID válido" })
+    idOnibus!: string;
+}
