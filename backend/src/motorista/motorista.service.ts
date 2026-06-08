@@ -1,8 +1,6 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { Model } from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
-
-
 import { Motorista, MotoristaDocument } from '../schemas/motorista.schema';
 import { CreateMotoristaDto } from './dto/create-motorista.dto';
 import { UpdateMotoristaDto } from './dto/update-motorista.dto';
@@ -33,8 +31,8 @@ export class MotoristaService {
         return novoMotorista.save();
     }
     
-    async atualizar(id: string, data: UpdateMotoristaDto): Promise<Motorista> {
-        const motorista = await this.motoristaModel.findByIdAndUpdate(id, data, {
+    async atualizar(id: string, dados: UpdateMotoristaDto): Promise<Motorista> {
+        const motorista = await this.motoristaModel.findByIdAndUpdate(id, dados, {
             new: true, // retorna o atualizado
     });
         
