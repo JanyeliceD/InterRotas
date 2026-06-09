@@ -22,7 +22,7 @@ export class Ocorrencia {
     status!: 'ABERTA' | 'EM_ANDAMENTO' | 'RESOLVIDA';
 
     @Prop({ default: Date.now })
-    timestamp!: Date;
+    dataCriacao!: Date;
 
     @Prop()
     observacaoAdmin?: string;
