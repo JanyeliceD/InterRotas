@@ -10,7 +10,7 @@ export class Alerta {
         ref: 'Onibus',
         required: true 
     })
-    onibusId!: mongoose.Types.ObjectId;
+    idOnibus!: mongoose.Types.ObjectId;
 
     @Prop({ required: true })
     tipo!: 'DESVIO_ROTA' | 'ATRASO' | 'LOTACAO' | 'OUTRO';

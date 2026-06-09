@@ -4,7 +4,7 @@ export class CreateAlertaDto {
     @IsString({ message: "Onibus ID é obrigatório" })
     @IsNotEmpty({ message: "Onibus ID não pode ser vazio" })
     @IsMongoId({ message: "Onibus ID deve ser um ID válido" })
-    onibusId!: string;
+    idOnibus!: string;
 
     @IsString({ message: "Tipo é obrigatório" })
     @IsNotEmpty({ message: "Tipo não pode ser vazio" })
@@ -17,8 +17,4 @@ export class CreateAlertaDto {
     @IsString()
     @IsOptional()
     descricao?: string;
-
-    @IsDateString( {}, {message: "Data de criação deve ser uma data válida" })
-    @IsNotEmpty({ message: "Data de criação não pode ser vazio" })
-    dataCriacao!: Date;
 }
