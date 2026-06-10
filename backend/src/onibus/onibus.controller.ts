@@ -1,11 +1,13 @@
-import { 
-    Controller, 
-    Get, 
-    Post, 
-    Delete,
-    Param, 
-    Patch,
-    Body 
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  Patch,
+  Post,
+  Put,
+  Query,
 } from '@nestjs/common';
 import { OnibusService } from './onibus.service';
 import { CreateOnibusDto } from './dto/create-onibus.dto';
@@ -16,8 +18,11 @@ export class OnibusController {
     constructor(private readonly onibusService: OnibusService) {}
 
     @Get()
-    listar() {
-        return this.onibusService.listar();
+    listar(
+        @Query('placa') placa?: string,
+        @Query('modelo') modelo?: string,
+    ) {
+        return this.onibusService.listar(placa, modelo);
     }
 
     @Get(':id')
