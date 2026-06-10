@@ -10,7 +10,7 @@ export class Localizacao {
         ref: 'Onibus',
         required: true
     })
-    onibusId!: mongoose.Types.ObjectId;
+    idOnibus!: mongoose.Types.ObjectId;
 
     @Prop({ required: true })
     latitude!: number;

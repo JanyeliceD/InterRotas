@@ -4,7 +4,7 @@ import { InjectModel } from '@nestjs/mongoose';
 import mongoose from 'mongoose';
 
 import { Parada, ParadaDocument } from 'src/schemas/parada.schemas';
-import { Evento, EventoDocument } from 'src/schemas/evento.schema';
+import { Alerta, AlertaDocument } from 'src/schemas/alerta.schema';
 import { Localizacao, LocalizacaoDocument } from 'src/schemas/localizacao.schemas';
 import { CreateLocalizacaoDto } from './dto/create-localizacao.dto';
 
@@ -12,7 +12,7 @@ import { CreateLocalizacaoDto } from './dto/create-localizacao.dto';
 export class LocalizacaoService {
     constructor(
         @InjectModel(Parada.name) private paradaModel: Model<ParadaDocument>,
-        @InjectModel(Evento.name) private eventoModel: Model<EventoDocument>,
+        @InjectModel(Alerta.name) private alertaModel: Model<AlertaDocument>,
         @InjectModel(Localizacao.name) private localizacaoModel: Model<Localizacao>,
     ) {}
 
@@ -31,60 +31,21 @@ export class LocalizacaoService {
     }
 
     async processarLocalizacao(dados: CreateLocalizacaoDto) {
-        const { onibusId, latitude, longitude } = dados;
+        const { idOnibus, latitude, longitude } = dados;
 
-        await this.localizacaoModel.create({
-            onibusId: new mongoose.Types.ObjectId(onibusId),
+        const localizacao = await this.localizacaoModel.create({
+            idOnibus: new mongoose.Types.ObjectId(idOnibus),
             latitude,
             longitude,
         });
 
-        const paradas = await this.paradaModel.find();
-
-        const RAIO = 50; // metros
-
-        for (const parada of paradas) {
-            const distancia = this.calcularDistancia(
-                latitude, 
-                longitude, 
-                parada.latitude, 
-                parada.longitude
-            );
-
-        if (distancia <= RAIO) {
-            const ultimoEvento = await this.eventoModel
-            .findOne({ onibusId })
-            .sort({ timestamp: -1 });
-
-            if (
-                ultimoEvento &&
-                ultimoEvento.paradaId.toString() === parada._id.toString()
-            ) {
-                return { message: 'Evento já registrado para esta parada' }
-            }
-
-            const evento = new this.eventoModel({
-                onibusId: new mongoose.Types.ObjectId(onibusId),
-                paradaId: parada._id,
-                timestamp: new Date(),
-            });
-
-            await evento.save();
-
-            return {
-                message: 'Parada detectada',
-                paradaId: parada._id,
-            };
-        }
+        return localizacao;
     }
 
-    return { message: 'Nenhuma parada detectada' };
-    }
-
-    async buscarUltimaLocalizacao(onibusId: string) {
+    async buscarUltimaLocalizacao(idOnibus: string) {
         return this.localizacaoModel
             .findOne({ 
-                onibusId: new mongoose.Types.ObjectId(onibusId)
+                idOnibus: new mongoose.Types.ObjectId(idOnibus)
             })
             .sort({ timestamp: -1 });
     }

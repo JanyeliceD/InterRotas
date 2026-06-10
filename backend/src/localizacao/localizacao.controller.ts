@@ -17,8 +17,8 @@ export class LocalizacaoController {
     return this.localizacaoService.processarLocalizacao(body);
   }
   
-  @Get('onibus/:onibusId')
-  buscarUltima(@Param('onibusId') onibusId: string) {
-    return this.localizacaoService.buscarUltimaLocalizacao(onibusId);
+  @Get('onibus/:idOnibus')
+  buscarUltima(@Param('idOnibus') idOnibus: string) {
+    return this.localizacaoService.buscarUltimaLocalizacao(idOnibus);
   }
 }

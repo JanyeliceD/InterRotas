@@ -1,10 +1,10 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import mongoose, { HydratedDocument } from 'mongoose';
 
-export type OcorrenciaDocument = HydratedDocument<Ocorrencia>;
+export type AlertaDocument = HydratedDocument<Alerta>;
 
 @Schema()
-export class Ocorrencia {
+export class Alerta {
     @Prop({ 
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Onibus',
@@ -13,20 +13,16 @@ export class Ocorrencia {
     idOnibus!: mongoose.Types.ObjectId;
 
     @Prop({ required: true })
-    tipo!: 'FALHA_MECANICA' | 'PNEU_FURADO' | 'ACIDENTE' | 'TRANSITO' | 'OUTRO';
+    tipo!: 'DESVIO_ROTA' | 'ATRASO' | 'LOTACAO' | 'OUTRO';
 
     @Prop()
     descricao?: string;
 
     @Prop({ required: true })
-    status!: 'ABERTA' | 'EM_ANDAMENTO' | 'RESOLVIDA';
+    nivel!: 'BAIXO' | 'MEDIO' | 'ALTO';
 
-    @Prop({ default: Date.now })
+    @Prop({ default: Date.now})
     dataCriacao!: Date;
-
-    @Prop()
-    observacaoAdmin?: string;
-
 }
 
-export const OcorrenciaSchema = SchemaFactory.createForClass(Ocorrencia);
+export const AlertaSchema = SchemaFactory.createForClass(Alerta);

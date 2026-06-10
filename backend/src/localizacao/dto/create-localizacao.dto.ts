@@ -1,9 +1,10 @@
-import { IsNumber, IsString, IsNotEmpty, IsDateString } from 'class-validator';
+import { IsNumber, IsString, IsNotEmpty, IsDateString, IsMongoId } from 'class-validator';
 
 export class CreateLocalizacaoDto {
     @IsString({ message: "Onibus ID é obrigatório" })
     @IsNotEmpty({ message: "Onibus ID não pode ser vazio" })
-    onibusId!: string;
+    @IsMongoId({ message: "Onibus ID deve ser um ID válido" })
+    idOnibus!: string;
 
     @IsNumber({}, { message: "Latitude é obrigatória" })
     @IsNotEmpty({ message: "Latitude não pode ser vazio" })

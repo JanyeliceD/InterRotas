@@ -5,6 +5,9 @@ export type OnibusDocument = HydratedDocument<Onibus>;
 
 @Schema()
 export class Onibus {
+    @Prop({ required: true, unique: true })
+    codigo!: string;
+
     @Prop({ required: true })
     placa!: string;
 
