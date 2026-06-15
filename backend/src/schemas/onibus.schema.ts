@@ -12,6 +12,9 @@ export class Onibus {
     placa!: string;
 
     @Prop({ required: true })
+    capacidade!: number;
+
+    @Prop({ required: true })
     modelo!: string;
 
     @Prop({ 

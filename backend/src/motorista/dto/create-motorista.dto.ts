@@ -13,6 +13,10 @@ export class CreateMotoristaDto {
     @IsNotEmpty({ message: "CNH não pode ser vazio" })
     cnh!: string;
 
+    @IsString({ message: "Email é obrigatório" })
+    @IsNotEmpty({ message: "Email não pode ser vazio" })
+    email!: string;
+
     @IsString({ message: "Telefone é obrigatório" })
     @IsNotEmpty({ message: "Telefone não pode ser vazio" })
     telefone!: string;

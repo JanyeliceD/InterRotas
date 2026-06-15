@@ -4,7 +4,6 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Motorista, MotoristaDocument } from '../schemas/motorista.schema';
 import { CreateMotoristaDto } from './dto/create-motorista.dto';
 import { UpdateMotoristaDto } from './dto/update-motorista.dto';
-import { Onibus } from 'src/schemas/onibus.schema';
 
 @Injectable()
 export class MotoristaService {
@@ -27,8 +26,31 @@ export class MotoristaService {
     }
     
     async criar(dados: CreateMotoristaDto): Promise<Motorista> {
-        const novoMotorista = new this.motoristaModel(dados);
-        return novoMotorista.save();
+        const ultimoMotorista = await this.motoristaModel
+            .findOne()
+            .sort({ matricula: -1 });
+                
+        let proximaMatricula = 1;
+
+        if (ultimoMotorista?.matricula) {
+            const numeroAtual = parseInt(
+                ultimoMotorista.matricula.replace('MOT', ''),
+                10,
+            );
+
+            if (!isNaN(numeroAtual)) {
+                proximaMatricula = numeroAtual + 1;
+            }
+        }
+
+        const matricula = `MOT${String(proximaMatricula).padStart(3, '0')}`;
+
+        const motoristaCriado = new this.motoristaModel({
+            ...dados,
+            matricula,
+        });
+
+        return motoristaCriado.save();
     }
     
     async atualizar(id: string, dados: UpdateMotoristaDto): Promise<Motorista> {
