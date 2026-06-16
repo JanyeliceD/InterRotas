@@ -17,12 +17,12 @@ export class Onibus {
     @Prop({ required: true })
     modelo!: string;
 
-    @Prop({ 
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'Rota',
-        required: true 
-    })
-    idRota!: mongoose.Types.ObjectId;
+    // @Prop({ 
+    //     type: mongoose.Schema.Types.ObjectId,
+    //     ref: 'Rota',
+    //     required: true 
+    // })
+    // idRota!: mongoose.Types.ObjectId;
 }
 
 export const OnibusSchema = SchemaFactory.createForClass(Onibus);

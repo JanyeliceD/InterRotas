@@ -41,8 +41,12 @@ export class OnibusService {
 
     async criar(dados: CreateOnibusDto): Promise<Onibus> {
       const ultimoOnibus = await this.onibusModel
-        .findOne()
-        .sort({ codigo: -1 });
+      .findOne({
+        codigo: /^BUS\d+$/
+      })
+      .sort({ codigo: -1 });
+
+      console.log('ultimo onibus', ultimoOnibus);
 
       let proximoNumero = 1;
 
@@ -59,7 +63,13 @@ export class OnibusService {
 
       const codigo = `BUS${String(proximoNumero).padStart(3, '0')}`;
 
-      const novoOnibus = new this.onibusModel({ codigo, ...dados });
+      const novoOnibus = new this.onibusModel({ 
+        ...dados,
+        codigo
+      });
+
+      console.log(dados);
+      console.log(codigo);
 
       return novoOnibus.save();
     }

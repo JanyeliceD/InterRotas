@@ -13,8 +13,8 @@ export class CreateOnibusDto {
     @IsNotEmpty({ message: "Capacidade não pode ser vazio" })
     capacidade!: number;
 
-    @IsString({ message: "ID da Rota é obrigatório" })
-    @IsNotEmpty({ message: "ID da Rota não pode ser vazio" })
-    @IsMongoId({ message: "ID da Rota deve ser um ID válido" })
-    idRota!: string;
+    // @IsString({ message: "ID da Rota é obrigatório" })
+    // @IsNotEmpty({ message: "ID da Rota não pode ser vazio" })
+    // @IsMongoId({ message: "ID da Rota deve ser um ID válido" })
+    // idRota!: string;
 }
