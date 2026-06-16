@@ -14,8 +14,26 @@ export class RotasService {
     @InjectModel(Rota.name) private rotaModel: Model<RotaDocument>
   ) {}
 
-  async listar() {
-    return this.rotaModel.find();
+  async listar(codigo?: string, nome?: string, motorista?: string) {
+    let resultado = await this.rotaModel.find();
+
+    if (!resultado || !codigo || !nome || !motorista) {
+      throw new NotFoundException('Nenhuma rota encontrada');
+    }
+
+    if (codigo) {
+      resultado = resultado.filter((rota) => rota.codigo === codigo);
+    }
+
+    if (nome) {
+      resultado = resultado.filter((rota) => rota.nome === nome);
+    }
+
+    if (motorista) {
+      resultado = resultado.filter((rota) => rota.motorista === motorista);
+    }
+
+    return resultado;
   }
 
   async buscarPorId(id: string) {
@@ -29,7 +47,30 @@ export class RotasService {
   }
 
   async criar(dados: CreateRotaDto): Promise<Rota> {
-    const novaRota = new this.rotaModel(dados);
+    const ultimaRota = await this.rotaModel
+      .findOne()
+      .sort({ codigo: -1 });
+    
+    let proximoCodigo = 1;
+
+    if (ultimaRota?.codigo) {
+      const numeroAtual = parseInt(
+        ultimaRota.codigo.replace('ROTA', ''),
+        10,
+      );
+
+      if (!isNaN(numeroAtual)) {
+        proximoCodigo = numeroAtual + 1;
+      }
+    }
+
+    const codigo = `ROTA${String(proximoCodigo).padStart(3, '0')}`;
+
+    const novaRota = await this.rotaModel.create({
+      ...dados,
+      codigo,
+    });
+
     return novaRota.save();
   }
 

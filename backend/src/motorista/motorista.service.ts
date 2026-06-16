@@ -11,7 +11,21 @@ export class MotoristaService {
         @InjectModel(Motorista.name) private motoristaModel: Model<MotoristaDocument>,
     ) {}
 
-    async listar() {
+    async listar(matricula?: string, nome?: string) {
+        let resultado = await this.motoristaModel.find();
+
+        if (!resultado || !matricula || !nome) {
+            throw new NotFoundException('Nenhum motorista encontrado');
+        }
+
+        if (matricula) {
+            resultado = resultado.filter((motorista) => motorista.matricula === matricula);
+        }
+
+        if (nome) {
+            resultado = resultado.filter((motorista) => motorista.nome === nome);
+        }
+        
         return this.motoristaModel.find();
     }
     

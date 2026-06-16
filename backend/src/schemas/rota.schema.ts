@@ -5,6 +5,9 @@ export type RotaDocument = HydratedDocument<Rota>;
 
 @Schema()
 export class Rota {
+    @Prop({ required: true, unique: true })
+    codigo!: string;
+    
     @Prop({ 
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Onibus',

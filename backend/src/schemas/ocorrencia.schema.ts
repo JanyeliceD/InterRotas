@@ -5,6 +5,9 @@ export type OcorrenciaDocument = HydratedDocument<Ocorrencia>;
 
 @Schema()
 export class Ocorrencia {
+    @Prop({ required: true, unique: true })
+    codigo!: string;
+
     @Prop({ 
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Onibus',
