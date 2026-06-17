@@ -5,6 +5,9 @@ export type ParadaDocument = HydratedDocument<Parada>;
 
 @Schema()
 export class Parada {
+    @Prop({ required: true, unique: true })
+    codigo!: string;
+    
     @Prop({ required: true })
     nome!: string;
 

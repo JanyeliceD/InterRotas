@@ -68,9 +68,6 @@ export class OnibusService {
         codigo
       });
 
-      console.log(dados);
-      console.log(codigo);
-
       return novoOnibus.save();
     }
 
