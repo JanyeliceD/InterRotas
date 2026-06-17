@@ -29,12 +29,6 @@ export class Rota {
         required: true
     })
     paradas!: mongoose.Types.ObjectId[];
-
-    @Prop({ required: true })
-    origem!: string;
-
-    @Prop({ required: true })
-    destino!: string;
 }
 
 export const RotaSchema = SchemaFactory.createForClass(Rota);
