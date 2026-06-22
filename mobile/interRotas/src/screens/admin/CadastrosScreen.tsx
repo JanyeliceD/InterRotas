@@ -25,6 +25,15 @@ export default function CadastrosScreen({
 
       <TouchableOpacity
         style={styles.card}
+        onPress={() => navigation.navigate('CadastrarParada')}
+      >
+        <Text style={styles.cardTitulo}>
+          Cadastrar Parada
+        </Text>
+      </TouchableOpacity>
+
+      <TouchableOpacity
+        style={styles.card}
         onPress={() => navigation.navigate('CadastrarRota')}
       >
         <Text style={styles.cardTitulo}>
@@ -63,7 +72,7 @@ const styles = StyleSheet.create({
     padding: 20,
     borderRadius: 10,
     marginBottom: 16,
-    borderColor: '#1E40AF',
+    borderColor: '#E2E8F0',
     borderWidth: 1,
   },
 

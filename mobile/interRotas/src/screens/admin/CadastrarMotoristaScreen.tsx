@@ -6,32 +6,43 @@ import {
   TouchableOpacity,
   Alert,
 } from 'react-native';
-
 import { useState } from 'react';
+import { cadastrarMotorista } from '../../services/motoristaService';
 
 export default function CadastrarMotoristaScreen() {
   const [nome, setNome] = useState('');
   const [cpf, setCpf] = useState('');
-  const [telefone, setTelefone] =
-    useState('');
+  const [cnh, setCnh] = useState('');
+  const [email, setEmail] = useState('');
+  const [telefone, setTelefone] = useState('');
 
-  function cadastrar() {
-    if (!nome || !cpf || !telefone) {
-      Alert.alert(
-        'Erro',
-        'Preencha todos os campos.'
+  async function cadastrar() {
+    try {
+      await cadastrarMotorista({
+        nome,
+        cpf,
+        cnh,
+        email,
+        telefone,
+      })
+
+        Alert.alert(
+        'Sucesso',
+        'Motorista cadastrado.'
       );
-
-      return;
+    } catch {
+        if (!nome || !cpf || !cnh || !email || !telefone) {
+        Alert.alert(
+          'Erro',
+          'Preencha todos os campos.'
+        );
+      }
     }
-
-    Alert.alert(
-      'Sucesso',
-      'Motorista cadastrado.'
-    );
 
     setNome('');
     setCpf('');
+    setCnh('');
+    setEmail('');
     setTelefone('');
   }
 
@@ -55,6 +66,22 @@ export default function CadastrarMotoristaScreen() {
         placeholderTextColor="#64748B"
         value={cpf}
         onChangeText={setCpf}
+      />
+
+      <TextInput
+        style={styles.input}
+        placeholder="CNH"
+        placeholderTextColor="#64748B"
+        value={cnh}
+        onChangeText={setCnh}
+      />
+
+      <TextInput
+        style={styles.input}
+        placeholder="Email"
+        placeholderTextColor="#64748B"
+        value={email}
+        onChangeText={setEmail}
       />
 
       <TextInput
