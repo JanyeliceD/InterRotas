@@ -7,27 +7,29 @@ import {
   Alert,
 } from 'react-native';
 import { useState } from 'react';
-import { cadastrarOnibus } from '../../services/onibusService';
+import { cadastrarParada } from '../../services/paradaService';
 
-export default function CadastrarOnibusScreen() {
-  const [placa, setPlaca] = useState('');
-  const [modelo, setModelo] = useState('');
-  const [capacidade, setCapacidade] = useState('');
+export default function CadastrarParadaScreen() {
+  const [nome, setNome] = useState('');
+  const [endereco, setEndereco] = useState('');
+  const [latitude, setLatitude] = useState('');
+  const [longitude, setLongitude] = useState('');
 
   async function cadastrar() {
     try {
-      await cadastrarOnibus({
-        placa,
-        modelo,
-        capacidade: Number(capacidade),
+      await cadastrarParada({
+        nome,
+        endereco,
+        latitude: Number(latitude),
+        longitude: Number(longitude),
       });
 
         Alert.alert(
         'Sucesso',
-        'Ônibus cadastrado.'
+        'Parada cadastrada.'
       );
     } catch {
-      if (!placa || !modelo || !capacidade) {
+      if (!nome || !latitude || !longitude) {
         Alert.alert(
           'Erro',
           'Preencha todos os campos.'
@@ -35,40 +37,48 @@ export default function CadastrarOnibusScreen() {
       }
     }
 
-    setPlaca('');
-    setModelo('');
-    setCapacidade('');
+    setNome('');
+    setEndereco('');
+    setLatitude('');
+    setLongitude('');
   }
 
   return (
     <View style={styles.container}>
       <Text style={styles.titulo}>
-        Cadastrar Ônibus
+        Cadastrar Parada
       </Text>
 
       <TextInput
         style={styles.input}
-        placeholder="Placa"
+        placeholder="Nome da parada"
         placeholderTextColor="#64748B"
-        value={placa}
-        onChangeText={setPlaca}
+        value={nome}
+        onChangeText={setNome}
       />
 
       <TextInput
         style={styles.input}
-        placeholder="Modelo"
+        placeholder="Endereço"
         placeholderTextColor="#64748B"
-        value={modelo}
-        onChangeText={setModelo}
+        value={endereco}
+        onChangeText={setEndereco}
       />
 
       <TextInput
         style={styles.input}
-        placeholder="Capacidade de passageiros"
+        placeholder="Latitude"
         placeholderTextColor="#64748B"
-        keyboardType="numeric"
-        value={capacidade}
-        onChangeText={setCapacidade}
+        value={latitude}
+        onChangeText={setLatitude}
+      />
+
+      <TextInput
+        style={styles.input}
+        placeholder="Longitude"
+        placeholderTextColor="#64748B"
+        value={longitude}
+        onChangeText={setLongitude}
       />
 
       <TouchableOpacity

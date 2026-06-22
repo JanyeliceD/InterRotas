@@ -8,6 +8,7 @@ import RegistrarOcorrenciaScreen from '../screens/motorista/RegistrarOcorrenciaS
 import CadastrarOnibusScreen from '../screens/admin/CadastrarOnibusScreen';
 import CadastrarRotaScreen from '../screens/admin/CadastrarRotaScreen';
 import CadastrarMotoristaScreen from '../screens/admin/CadastrarMotoristaScreen';
+import CadastrarParadaScreen from '../screens/admin/CadastrarParadaScreen';
 
 export type RootStackParamList = {
   Login: undefined;
@@ -17,6 +18,7 @@ export type RootStackParamList = {
   CadastrarOnibus: undefined;
   CadastrarRota: undefined;
   CadastrarMotorista: undefined;
+  CadastrarParada: undefined;
 };
 
 const Stack = createNativeStackNavigator();
@@ -61,6 +63,11 @@ export function RootNavigator() {
           name="CadastrarMotorista"
           component={CadastrarMotoristaScreen}
           options={{ title: 'Cadastrar Motorista' }}
+        />
+        <Stack.Screen
+          name="CadastrarParada"
+          component={CadastrarParadaScreen}
+          options={{ title: 'Cadastrar Parada' }}
         />
       </Stack.Navigator>
     </NavigationContainer>
