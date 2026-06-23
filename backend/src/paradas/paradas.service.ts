@@ -11,23 +11,25 @@ export class ParadasService {
     @InjectModel(Parada.name) private paradaModel: Model<ParadaDocument>
   ) {}
   
-  async listar(codigo?: string, nome?: string): Promise<Parada[]> {
+async listar(codigo?: string, nome?: string) {
     let resultado = await this.paradaModel.find();
 
-    if (!resultado || !codigo || !nome) {
-      throw new NotFoundException('Nenhuma parada encontrada');
-    }
-
     if (codigo) {
-      resultado = resultado.filter((parada) => parada.codigo === codigo);
+        resultado = resultado.filter(
+            (parada) =>
+                parada.codigo === codigo,
+        );
     }
 
     if (nome) {
-      resultado = resultado.filter((parada) => parada.nome === nome);
+        resultado = resultado.filter(
+            (parada) =>
+                parada.nome === nome,
+        );
     }
 
     return resultado;
-  }
+}
 
   async buscarPorId(id: string) {
     const parada = await this.paradaModel.findById(id);
