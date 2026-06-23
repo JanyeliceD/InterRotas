@@ -12,22 +12,24 @@ export class OnibusService {
     ) {}
 
     async listar(placa?: string, modelo?: string) {
-      let resultado = await this.onibusModel.find();
+    let resultado = await this.onibusModel.find();
 
-      if (!resultado || !placa || !modelo) {
-        throw new NotFoundException('Nenhum ônibus encontrado');
-      }
-
-      if (placa) {
-        resultado = resultado.filter((onibus) => onibus.placa === placa);
-      }
-
-      if (modelo) {
-        resultado = resultado.filter((onibus) => onibus.modelo === modelo);
-      }
-
-      return resultado;
+    if (placa) {
+        resultado = resultado.filter(
+            (onibus) =>
+                onibus.placa === placa,
+        );
     }
+
+    if (modelo) {
+        resultado = resultado.filter(
+            (onibus) =>
+                onibus.modelo === modelo,
+        );
+    }
+
+    return resultado;
+}
 
     async buscarPorId(id: string) {
       const onibus = await this.onibusModel.findById(id);

@@ -12,27 +12,25 @@ export class RotasService {
     @InjectModel(Rota.name) private rotaModel: Model<RotaDocument>
   ) {}
 
-  async listar(codigo?: string, nome?: string, motorista?: string) {
+async listar(codigo?: string, nome?: string) {
     let resultado = await this.rotaModel.find();
 
-    if (!resultado || !codigo || !nome || !motorista) {
-      throw new NotFoundException('Nenhuma rota encontrada');
-    }
-
     if (codigo) {
-      resultado = resultado.filter((rota) => rota.codigo === codigo);
+        resultado = resultado.filter(
+            (rota) =>
+                rota.codigo === codigo,
+        );
     }
 
     if (nome) {
-      resultado = resultado.filter((rota) => rota.nome === nome);
-    }
-
-    if (motorista) {
-      resultado = resultado.filter((rota) => rota.motorista === motorista);
+        resultado = resultado.filter(
+            (rota) =>
+                rota.nome === nome,
+        );
     }
 
     return resultado;
-  }
+}
 
   async buscarPorId(id: string) {
     const rota = await this.rotaModel.findById(id);

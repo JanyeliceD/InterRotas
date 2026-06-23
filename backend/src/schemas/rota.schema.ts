@@ -7,19 +7,24 @@ export type RotaDocument = HydratedDocument<Rota>;
 export class Rota {
     @Prop({ required: true, unique: true })
     codigo!: string;
-    
+
+
+    @Prop({ required: true })
+    nome!: string;
+
+    @Prop({ 
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'motorista',
+        required: true 
+    })
+    idMotorista!: mongoose.Types.ObjectId;
+
     @Prop({ 
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Onibus',
         required: true 
     })
     idOnibus!: mongoose.Types.ObjectId;
-
-    @Prop({ required: true })
-    nome!: string;
-
-    @Prop({ required: true })
-    motorista!: string;
 
     @Prop({
         type: [{
