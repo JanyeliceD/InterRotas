@@ -1,24 +1,70 @@
-import { Image, View, Text, StyleSheet, TextInput, FlatList, TouchableOpacity, Dimensions } from 'react-native';
-import { useState } from 'react';
+import { 
+  View, 
+  Text, 
+  StyleSheet, 
+  TextInput, 
+  FlatList, 
+  TouchableOpacity, 
+  ActivityIndicator,
+  Alert 
+} from 'react-native';
+import { useState, useEffect } from 'react';
 
-// Adicionado o campo 'quilometragem' em cada ônibus para simular os dados acumulados do GPS
-const Rotas = [
-  { id: '1', nome: 'Linha 101 - Centro x Industrial', status: 'Andamento', onibus: 'ABC-1234', lat: -23.55052, lng: -46.633308, motorista: 'luiz', quilometragem: 1200 },
-  { id: '2', nome: 'Linha 202 - Interbairros Norte', status: 'Atrasado', onibus: 'XYZ-5678', lat: -23.55552, lng: -46.639308, motorista: 'joana', quilometragem: 5400 }, // Dispara o alerta (> 5000km)
-  { id: '3', nome: 'Linha 305 - Distrito Comercial', status: 'Andamento', onibus: 'MNO-9012', lat: -23.54852, lng: -46.628308, motorista: 'joana', quilometragem: 3100 },
-  { id: '4', nome: 'Linha 404 - Bairro Novo', status: 'Atrasado', onibus: 'PQR-3456', lat: -23.55252, lng: -46.630308, motorista: 'carlos', quilometragem: 6200 }, // Dispara o alerta (> 5000km)
-  { id: '5', nome: 'Linha 505 - Terminal Rodoviário', status: 'Andamento', onibus: 'STU-7890', lat: -23.54952, lng: -46.632308, motorista: 'ana', quilometragem: 800 },
-  { id: '6', nome: 'Linha 606 - Zona Sul', status: 'Atrasado', onibus: 'VWX-2345', lat: -23.55152, lng: -46.635308, motorista: 'maria', quilometragem: 4900 },
-  { id: '7', nome: 'Linha 707 - Aeroporto', status: 'Andamento', onibus: 'YZA-6789', lat: -23.55352, lng: -46.631308, motorista: 'pedro', quilometragem: 1500 },
-];
+// 1. Importa a função do serviço que criamos e a interface de tipagem
+import { listarRotas, Rotas } from '../../services/rotaService'; // Ajuste o caminho da pasta se necessário
 
 export default function DashboardScreen() {
   const [busca, setBusca] = useState('');
+  
+  // 2. Estados para armazenar as rotas vindas do BD e gerenciar o carregamento
+  const [rotas, setRotas] = useState<Rotas[]>([]);
+  const [carregando, setCarregando] = useState(true);
 
-  const rotasFiltradas = Rotas.filter((rota) =>  
-    rota.nome.toLowerCase().includes(busca.toLowerCase()) ||
-    rota.motorista.toLowerCase().includes(busca.toLowerCase())
+  // 3. Função que chama o serviço Axios
+  const buscarRotasDoBackend = async () => {
+  try {
+    setCarregando(true);
+    const dados = await listarRotas();
+    
+    // Altere esta linha para garantir que seja sempre um Array:
+    if (Array.isArray(dados)) {
+      setRotas(dados);
+    } else if (dados && typeof dados === 'object' && 'data' in dados && Array.isArray(dados.data)) {
+      // Caso o NestJS devolva algo como { data: [...] }
+      setRotas(dados.data);
+    } else {
+      setRotas([]); // Evita que o app quebre se o banco vier vazio
+    }
+
+  } catch (error) {
+    console.error(error);
+    Alert.alert('Erro', 'Não foi possível sincronizar as rotas com o servidor.');
+  } finally {
+    setCarregando(false);
+  }
+};
+  // 4. Executa a busca automaticamente ao montar a tela
+  useEffect(() => {
+    buscarRotasDoBackend();
+  }, []);
+
+  // O filtro agora varre a lista 'rotas' dinâmica preenchida pelo backend
+  const rotasFiltradas = rotas.filter((rota) =>  
+    rota.nome?.toLowerCase().includes(busca.toLowerCase()) ||
+    rota.motorista?.toLowerCase().includes(busca.toLowerCase())
   );
+
+  // Exibe tela de carregamento inicial enquanto o backend responde
+  if (carregando && rotas.length === 0) {
+    return (
+      <View style={[styles.container, { justifyContent: 'center', alignItems: 'center' }]}>
+        <ActivityIndicator size="large" color="#1E40AF" />
+        <Text style={{ marginTop: 12, color: '#475569', fontWeight: '500' }}>
+          Conectando ao banco de dados...
+        </Text>
+      </View>
+    );
+  }
 
   return (
     <View style={styles.container}>
@@ -41,9 +87,14 @@ export default function DashboardScreen() {
         
         <FlatList
           data={rotasFiltradas}
-          keyExtractor={(item) => item.id}
+          keyExtractor={(item, index) => item?._id?.toString() || item?.id?.toString() || index.toString()}
           contentContainerStyle={styles.listContainer}
           showsVerticalScrollIndicator={false}
+          
+          // Recurso Pull-to-Refresh: arrastar para baixo atualiza os dados
+          refreshing={carregando}
+          onRefresh={buscarRotasDoBackend}
+          
           renderItem={({ item }) => (
             <TouchableOpacity style={styles.rotaCard} activeOpacity={0.7}>
               
@@ -58,20 +109,18 @@ export default function DashboardScreen() {
                   <Text style={styles.boldText}>Motorista: </Text>{item.motorista}
                 </Text>
 
-                {/* VISUAL NOVO: Exibição da quilometragem vinda do GPS */}
                 <Text style={styles.rotaDetalhe}>
-                  <Text style={styles.boldText}>Odômetro: </Text>{item.quilometragem} km
+                  <Text style={styles.boldText}>Odômetro: </Text>{item.quilometragem || 0} km
                 </Text>
 
-                {/* LOGIC/VISUAL NOVO: Alerta condicional de Manutenção preventiva */}
-                {item.quilometragem >= 5000 && (
+                {/* Validação baseada no dado numérico dinâmico */}
+                {(item.quilometragem || 0) >= 5000 && (
                   <View style={styles.manutencaoBadge}>
                     <Text style={styles.manutencaoText}>⚠️ REQUER TROCA DE ÓLEO</Text>
                   </View>
                 )}
               </View>
 
-              {/* Status de Andamento ou Atrasado */}
               <View style={[
                 styles.statusBadge, 
                 { backgroundColor: item.status === 'Atrasado' ? '#FEE2E2' : '#D1FAE5' }
@@ -80,7 +129,7 @@ export default function DashboardScreen() {
                   styles.statusText, 
                   { color: item.status === 'Atrasado' ? '#991B1B' : '#065F46' }
                 ]}>
-                  {item.status}
+                  {item.status || 'Andamento'}
                 </Text>
               </View>
 
@@ -94,7 +143,7 @@ export default function DashboardScreen() {
 
 const styles = StyleSheet.create({
   mapContainer: {
-    height: 120, // Reduzi um pouco para sobrar mais espaço para os novos textos nos cards
+    height: 120,
     width: '100%',
   },
   container: {
@@ -182,7 +231,6 @@ const styles = StyleSheet.create({
     fontSize: 11,
     fontWeight: '700',
   },
-  // Estilos novos para a etiqueta de alerta de óleo
   manutencaoBadge: {
     backgroundColor: '#FFF1F2',
     borderWidth: 1,
