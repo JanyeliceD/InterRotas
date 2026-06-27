@@ -11,26 +11,36 @@ export class OcorrenciaService {
         @InjectModel(Ocorrencia.name) private ocorrenciaModel: Model<OcorrenciaDocument>,
     ) {}
 
-    async listar(codigo?: string, tipo?: string, idOnibus?: string) {
-        let resultado = await this.ocorrenciaModel.find();
+    async listar(
+        codigo?: string, 
+        tipo?: 'FALHA_MECANICA' | 'PNEU_FURADO' | 'ACIDENTE' | 'TRANSITO' | 'OUTRO', 
+        status?: 'ABERTA' | 'EM_ANDAMENTO' | 'RESOLVIDA') {
+    let resultado = await this.ocorrenciaModel
+    .find()
+    .populate('idOnibus', 'codigo placa');
 
-        if (!resultado || !codigo || !tipo || !idOnibus) {
-            throw new NotFoundException('Nenhuma ocorrência encontrada');
-        }
+    if (codigo) {
+        resultado = resultado.filter(
+            (ocorrencia) =>
+                ocorrencia.codigo === codigo,
+        );
+    }
 
-        if (codigo) {
-            resultado = resultado.filter((ocorrencia) => ocorrencia.codigo === codigo);
-        }
+    if (tipo) {
+        resultado = resultado.filter(
+            (ocorrencia) =>
+                ocorrencia.tipo === tipo,
+        );
+    }
 
-        if (tipo) {
-            resultado = resultado.filter((ocorrencia) => ocorrencia.tipo === tipo);
-        }
+    if (status) {
+        resultado = resultado.filter(
+            (ocorrencia) =>
+                ocorrencia.status === status,
+        );
+    }
 
-        if (idOnibus) {
-            resultado = resultado.filter((ocorrencia) => ocorrencia.idOnibus.toString() === idOnibus);
-        }
-
-        return resultado;
+    return resultado;
     }
 
     async buscarPorId(id: string) {

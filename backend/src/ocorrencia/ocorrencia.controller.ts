@@ -6,6 +6,7 @@ import {
     Param,
     Patch,
     Body,
+    Query,
  } from '@nestjs/common';
 import { OcorrenciaService } from './ocorrencia.service';
 import { CreateOcorrenciaDto } from './dto/create-ocorrencia.dto';
@@ -16,8 +17,10 @@ export class OcorrenciaController {
     constructor(private readonly ocorrenciaService: OcorrenciaService) {}
 
     @Get()
-    listar() {
-        return this.ocorrenciaService.listar();
+    listar(
+        @Query('codigo') codigo?: string,
+    ) {
+        return this.ocorrenciaService.listar(codigo);
     }
 
     @Get(':id')
