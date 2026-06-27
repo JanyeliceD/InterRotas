@@ -165,8 +165,13 @@ export default function OcorrenciasScreen() {
 
             {item.descricao && (
               <Text style={styles.descricao}>
-                Descrição: {item.descricao}
-              </Text>
+                <Text
+                  style={styles.descricaoTitulo}
+                >
+                  Descrição:
+                </Text>{' '}
+                  {item.descricao}
+                </Text>
             )}
 
             <Text style={styles.horario}>
@@ -243,9 +248,9 @@ const styles = StyleSheet.create({
   },
 
   statusBadge: {
-    paddingHorizontal: 10,
-    paddingVertical: 6,
-    borderRadius: 8,
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    borderRadius: 6,
   },
 
   statusText: {
@@ -307,6 +312,10 @@ const styles = StyleSheet.create({
   descricao: {
     color: '#475569',
     marginTop: 6,
+  },
+  descricaoTitulo: {
+    fontWeight: '600',
+    color: '#1E293B',
   },
   buttonContainer: {
   flexDirection: 'row',

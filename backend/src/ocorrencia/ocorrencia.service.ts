@@ -73,13 +73,11 @@ export class OcorrenciaService {
 
         const codigo = `OCOR${String(proximoCodigo).padStart(3, '0')}`;
 
-        const novaOcorrencia = await this.ocorrenciaModel.create({
+        return this.ocorrenciaModel.create({
             ...dados,
             codigo,
             status: 'ABERTA', // Define o status inicial como ABERTA
         });
-
-        return novaOcorrencia.save();
     }
 
     async atualizar(id: string, dados: UpdateOcorrenciaDto): Promise<Ocorrencia> {

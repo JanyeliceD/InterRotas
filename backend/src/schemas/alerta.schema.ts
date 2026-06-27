@@ -5,6 +5,9 @@ export type AlertaDocument = HydratedDocument<Alerta>;
 
 @Schema()
 export class Alerta {
+    @Prop({ required: true, unique: true })
+    codigo!: string;
+
     @Prop({ 
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Onibus',
@@ -19,7 +22,7 @@ export class Alerta {
     descricao?: string;
 
     @Prop({ required: true })
-    nivel!: 'BAIXO' | 'MEDIO' | 'ALTO';
+    status!: 'NOVO' | 'CIENTE' | 'ATENDIDO';
 
     @Prop({ default: Date.now})
     dataCriacao!: Date;
