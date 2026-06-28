@@ -1,118 +1,262 @@
-import { Alert, View, Text, StyleSheet, FlatList, TouchableOpacity, Pressable } from 'react-native';
-import { useState } from 'react';
+import {
+  Alert,
+  View,
+  Text,
+  StyleSheet,
+  FlatList,
+  TouchableOpacity,
+  ActivityIndicator,
+} from 'react-native';
 
-interface Alerta {
-    id: string;
-    titulo: string;
-    descricao: string;
-    data: string;
-    status: 'Atrasado' | 'Ação Tomada' | 'Ciente';
-    ciente?: boolean;
-}
+import { useEffect, useState } from 'react';
 
-const AlertasIniciais: Alerta[] = [
-    {
-        id: '1',
-        titulo: 'Rota 101 atrasada',
-        descricao: 'A rota 101 - Centro x Industrial está com atraso de 15 minutos devido ao trânsito intenso.',
-        data: '2024-06-15 14:30',
-        status: 'Atrasado'
-    },
-    {
-        id: '3',
-        titulo: 'Rota 305 atrasada',
-        descricao: 'A rota 305 - Distrito Comercial está com atraso de 10 minutos devido a um acidente na via.',
-        data: '2024-06-15 14:30',
-        status: 'Atrasado'
-    },
-];
+import {
+  Alerta,
+  listarAlertas,
+  atualizarStatus
+} from '../../services/alertaService';
 
 export default function AlertasScreen() {
-     const [Alertas, setAlertas] = useState<Alerta[]>(AlertasIniciais);
+  const [alertas, setAlertas] = useState<Alerta[]>([]);
+  const [loading, setLoading] = useState(true);
 
-    function Ciente(id: string) {
-        setAlertas(prevState => prevState.map(alerta =>
-            alerta.id === id ? { ...alerta, ciente: true, status: 'Ciente' } : alerta
-        ));
-        Alert.alert('Alerta Ciente', 'Você marcou o alerta como ciente.');
+  useEffect(() => {
+    carregarAlertas();
+  }, []);
+
+  async function carregarAlertas() {
+    try {
+      const dados = await listarAlertas();
+      setAlertas(dados);
+    } catch (error) {
+      console.error(error);
+
+      Alert.alert(
+        'Erro',
+        'Não foi possível carregar os alertas.'
+      );
+    } finally {
+      setLoading(false);
     }
-    function ProvidenciarAção(id: string, titulo: string) {
-        setAlertas(prevState => prevState.map(alerta =>
-            alerta.id === id ? { ...alerta, status: 'Ação Tomada' } : alerta
-        ));
-        Alert.alert('Ação Providenciada', 'A equipe de manutenção foi acionada para resolver o problema.');
+  }
+
+    async function alterarStatus(
+    id: string,
+    status: 'CIENTE' | 'ATENDIDO'
+    ) {
+    try {
+        await atualizarStatus(id, status);
+
+        await carregarAlertas();
+    } catch (error) {
+        Alert.alert(
+        'Erro',
+        'Não foi possível atualizar o alerta.'
+        );
+    }
     }
 
-    function obterCoresStatus(status: Alerta['status']) {
-        switch (status) {
-            case 'Atrasado':
-                return { fundo: '#FEE2E2', texto: '#991B1B' }; 
-            case 'Ciente':
-                return { fundo: '#FEF3C7', texto: '#92400E' }; 
-            case 'Ação Tomada':
-            default:
-                return { fundo: '#D1FAE5', texto: '#065F46' }; 
-        }
+    function obterCorStatus(status: string) {
+    switch (status) {
+        case 'NOVO':
+        return {
+            fundo: '#FEE2E2',
+            texto: '#991B1B',
+        };
+
+        case 'CIENTE':
+        return {
+            fundo: '#FEF3C7',
+            texto: '#92400E',
+        };
+
+        case 'ATENDIDO':
+        return {
+            fundo: '#DCFCE7',
+            texto: '#166534',
+        };
+
+        default:
+        return {
+            fundo: '#E2E8F0',
+            texto: '#475569',
+        };
+    }
     }
 
+    function formatarStatus(status: string) {
+    switch (status) {
+        case 'NOVO':
+        return 'Novo';
+
+        case 'CIENTE':
+        return 'Ciente';
+
+        case 'ATENDIDO':
+        return 'Atendido';
+
+        default:
+        return status;
+    }
+    }
+
+    const coresTipo = {
+        fundo: '#FEE2E2',
+        texto: '#991B1B',
+    };
+
+  function formatarTipo(tipo: string) {
+    switch (tipo) {
+      case 'ATRASO':
+        return 'Atraso';
+
+      case 'DESVIO_ROTA':
+        return 'Desvio de rota';
+
+      case 'LOTACAO':
+        return 'Lotação';
+
+      default:
+        return 'Outro';
+    }
+  }
+
+  if (loading) {
     return (
-        <View style={styles.container}>
-            <Text style={styles.title}>Alertas ({Alertas.length})</Text>
-            
-            <FlatList  
-                data={Alertas}
-                keyExtractor={(item) => item.id}
-                contentContainerStyle={styles.listContainer}
-                showsVerticalScrollIndicator={false}
-                renderItem={({ item }) => {
-                    const cores = obterCoresStatus(item.status);
-
-                    return (
-                        <TouchableOpacity style={styles.rotaCard} activeOpacity={0.9}>
-                            <View style={styles.cardHeader}>
-                                <Text style={styles.rotaNome}>{item.titulo}</Text>
-                                
-                                <Text style={styles.rotaTexto}>
-                                    <Text style={styles.boldText}>Descrição: </Text>{item.descricao}
-                                </Text>
-                                
-                                <Text style={styles.rotaTexto}>
-                                    <Text style={styles.boldText}>Data: </Text>{item.data}
-                                </Text>
-
-                              
-                                <View style={[styles.statusBadge, { backgroundColor: cores.fundo }]}>
-                                    <Text style={[styles.statusText, { color: cores.texto }]}>
-                                        {item.status}
-                                    </Text>
-                                </View>
-                            </View>
-
-                           
-                            <View style={styles.botoesContainer}>
-                                <Pressable 
-                                    style={[styles.botaoSecundario, item.ciente && styles.botaoDesabilitado]}  
-                                    onPress={() => Ciente(item.id)}
-                                    disabled={item.ciente}
-                                >
-                                    <Text style={[styles.textBotaoSecundario, item.ciente && styles.textDesabilitado]}>
-                                        {item.ciente ? 'Ciente ✓' : 'Ciente'}
-                                    </Text>
-                                </Pressable>
-                                
-                                <Pressable 
-                                    style={styles.botaoPrincipal} 
-                                    onPress={() => ProvidenciarAção(item.id, item.titulo)}
-                                >
-                                    <Text style={styles.textBotaoPrincipal}>Providenciar Ação</Text>
-                                </Pressable>
-                            </View>
-                        </TouchableOpacity>
-                    );
-                }}
-            />
-        </View>
+      <View style={styles.loading}>
+        <ActivityIndicator
+          size="large"
+          color="#1E40AF"
+        />
+      </View>
     );
+  }
+
+  return (
+    <View style={styles.container}>
+      <Text style={styles.title}>
+        Alertas ({alertas.length})
+      </Text>
+
+      <FlatList
+        data={alertas}
+        keyExtractor={(item) => item._id}
+        ListEmptyComponent={
+          <Text style={styles.empty}>
+            Nenhum alerta encontrado.
+          </Text>
+        }
+        renderItem={({ item }) => {
+          return (
+            <View style={styles.rotaCard}>
+            <View style={styles.badgesContainer}>
+                <View
+                    style={[
+                    styles.statusBadge,
+                    {
+                        backgroundColor: coresTipo.fundo,
+                    },
+                    ]}
+                >
+                    <Text
+                    style={[
+                        styles.statusText,
+                        {
+                        color: coresTipo.texto,
+                        },
+                    ]}
+                    >
+                    {formatarTipo(item.tipo)}
+                    </Text>
+                </View>
+
+                <View
+                    style={[
+                    styles.statusBadge,
+                    {
+                        backgroundColor:
+                        obterCorStatus(item.status).fundo,
+                    },
+                    ]}
+                >
+                    <Text
+                    style={[
+                        styles.statusText,
+                        {
+                        color:
+                            obterCorStatus(item.status).texto,
+                        },
+                    ]}
+                    >
+                    {formatarStatus(item.status)}
+                    </Text>
+                </View>
+                </View>
+              <View style={styles.cardHeader}>
+                <Text style={styles.codigo}>
+                  {item.codigo}
+                </Text>
+                </View>
+
+                <Text style={styles.idOnibus}>
+                  {item.idOnibus.codigo} -{' '}
+                  {item.idOnibus.placa}
+                </Text>
+
+                {item.descricao && (
+                  <Text style={styles.rotaTexto}>
+                    <Text
+                      style={styles.boldText}
+                    >
+                      Descrição:
+                    </Text>{' '}
+                    {item.descricao}
+                  </Text>
+                )}
+
+                <Text style={styles.rotaTexto}>
+                  <Text style={styles.boldText}>
+                  </Text>
+                  {new Date(
+                    item.dataCriacao
+                  ).toLocaleString('pt-BR')}
+                </Text>
+
+              <View
+                style={styles.botoesContainer}
+              >
+                {item.status === 'NOVO' && (
+                <TouchableOpacity
+                    style={styles.botaoSecundario}
+                    onPress={() =>
+                    alterarStatus(item._id, 'CIENTE')
+                    }
+                >
+                    <Text style={styles.textBotaoSecundario}>
+                    Ciente
+                    </Text>
+                </TouchableOpacity>
+                )}
+
+                {item.status !== 'ATENDIDO' && (
+                <TouchableOpacity
+                    style={styles.botaoPrincipal}
+                    onPress={() =>
+                    alterarStatus(item._id, 'ATENDIDO')
+                    }
+                >
+                    <Text style={styles.textBotaoPrincipal}>
+                    Providenciar ação
+                    </Text>
+                </TouchableOpacity>
+                )}
+              </View>
+            </View>
+          );
+        }}
+      />
+    </View>
+  );
 }
 
 const styles = StyleSheet.create({
@@ -146,8 +290,9 @@ const styles = StyleSheet.create({
         elevation: 2,
     },
     cardHeader: {
-        flexDirection: 'column',
-        marginBottom: 12,
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
     },
     rotaNome: {
         fontSize: 17,
@@ -160,17 +305,23 @@ const styles = StyleSheet.create({
         color: '#475569',
         marginBottom: 4,
         lineHeight: 18,
+        marginTop: 4,
     },
     boldText: {
         fontWeight: '600',
         color: '#1E293B',
     },
+    badgesContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    gap: 8,
+    marginBottom: 12,
+    },
     statusBadge: {
-        paddingHorizontal: 10,
-        paddingVertical: 4,
+        paddingHorizontal: 12,
+        paddingVertical: 8,
         borderRadius: 6,
         alignSelf: 'flex-start',
-        marginTop: 8,
         minWidth: 95,
         alignItems: 'center',
         justifyContent: 'center',
@@ -220,5 +371,28 @@ const styles = StyleSheet.create({
     },
     textDesabilitado: {
         color: '#94A3B8',
-    }
+    },
+      loading: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+
+  empty: {
+    textAlign: 'center',
+    color: '#64748B',
+    marginTop: 40,
+  },
+
+  codigo: {
+    color: '#1E40AF',
+    fontSize: 18,
+    fontWeight: 'bold',
+  },
+    idOnibus: {
+    color: '#1E293B',
+    fontSize: 16,
+    fontWeight: 'bold',
+    marginTop: 4,
+  },
 });

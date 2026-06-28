@@ -4,45 +4,118 @@ import {
   StyleSheet,
   FlatList,
   TouchableOpacity,
+  Alert,
+  ActivityIndicator,
 } from 'react-native';
 
-const ocorrencias = [
-  {
-    id: '1',
-    placa: 'ABC-1234',
-    tipo: 'Pneu furado',
-    status: 'Pendente',
-    horario: '14:32',
-  },
+import { useEffect, useState } from 'react';
 
-  {
-    id: '2',
-    placa: 'XYZ-5678',
-    tipo: 'Atraso',
-    status: 'Resolvido',
-    horario: '13:10',
-  },
-
-  {
-    id: '3',
-    placa: 'KLM-9090',
-    tipo: 'Falha mecânica',
-    status: 'Em análise',
-    horario: '12:45',
-  },
-];
+import {
+  listarOcorrencias,
+  Ocorrencia,
+  atualizarStatus,
+} from '../../services/ocorrenciaService';
 
 export default function OcorrenciasScreen() {
+  const [ocorrencias, setOcorrencias] = useState<Ocorrencia[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    carregarOcorrencias();
+  }, []);
+
+  async function carregarOcorrencias() {
+    try {
+      const dados = await listarOcorrencias();
+      setOcorrencias(dados);
+    } catch (error) {
+      console.error(error);
+
+      Alert.alert(
+        'Erro',
+        'Não foi possível carregar as ocorrências.'
+      );
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  async function alteararStatus(
+    id: string,
+    status: 'EM_ANDAMENTO' | 'RESOLVIDA'
+  ) {
+    try {
+      await atualizarStatus(id, status);
+
+      carregarOcorrencias();
+    } catch (error) {
+      Alert.alert(
+        'Erro',
+        'Não foi possível atualizar a ocorrência'
+      );
+    }
+  }
+
   function obterCorStatus(status: string) {
-    if (status === 'Pendente') {
-      return '#F59E0B';
-    }
+    switch (status) {
+      case 'ABERTA':
+        return '#F59E0B';
 
-    if (status === 'Resolvido') {
-      return '#22C55E';
-    }
+      case 'EM_ANDAMENTO':
+        return '#3B82F6';
 
-    return '#3B82F6';
+      case 'RESOLVIDA':
+        return '#22C55E';
+
+      default:
+        return '#64748B';
+    }
+  }
+
+  function formatarStatus(status: string) {
+    switch (status) {
+      case 'ABERTA':
+        return 'Aberta';
+
+      case 'EM_ANDAMENTO':
+        return 'Em andamento';
+
+      case 'RESOLVIDA':
+        return 'Resolvida';
+
+      default:
+        return status;
+    }
+  }
+
+  function formatarTipo(tipo: string) {
+    switch (tipo) {
+      case 'FALHA_MECANICA':
+        return 'Falha mecânica';
+
+      case 'PNEU_FURADO':
+        return 'Pneu furado';
+
+      case 'ACIDENTE':
+        return 'Acidente';
+
+      case 'TRANSITO':
+        return 'Trânsito';
+
+      case 'OUTRO':
+        return 'Outro';
+
+      default:
+        return tipo;
+    }
+  }
+
+  if (loading) {
+    return (
+      <View style={styles.loading}>
+        <ActivityIndicator size="large" color="#1E40AF" />
+      </View>
+    );
   }
 
   return (
@@ -53,44 +126,87 @@ export default function OcorrenciasScreen() {
 
       <FlatList
         data={ocorrencias}
-        keyExtractor={(item) => item.id}
+        keyExtractor={(item) => item._id}
+        ListEmptyComponent={
+          <Text style={styles.empty}>
+            Nenhuma ocorrência encontrada.
+          </Text>
+        }
         renderItem={({ item }) => (
           <View style={styles.card}>
             <View style={styles.header}>
-              <Text style={styles.placa}>
-                {item.placa}
+              <Text style={styles.codigo}>
+                {item.codigo}
               </Text>
 
               <View
                 style={[
                   styles.statusBadge,
                   {
-                    backgroundColor:
-                      obterCorStatus(item.status),
+                    backgroundColor: obterCorStatus(
+                      item.status
+                    ),
                   },
                 ]}
               >
                 <Text style={styles.statusText}>
-                  {item.status}
+                  {formatarStatus(item.status)}
                 </Text>
               </View>
             </View>
 
+            <Text style={styles.idOnibus}>
+                {item.idOnibus.codigo} - {item.idOnibus.placa}
+              </Text>
+
             <Text style={styles.tipo}>
-              {item.tipo}
+              {formatarTipo(item.tipo)}
             </Text>
+
+            {item.descricao && (
+              <Text style={styles.descricao}>
+                <Text
+                  style={styles.descricaoTitulo}
+                >
+                  Descrição:
+                </Text>{' '}
+                  {item.descricao}
+                </Text>
+            )}
 
             <Text style={styles.horario}>
-              Horário: {item.horario}
+              {new Date(
+                item.dataCriacao
+              ).toLocaleString('pt-BR')}
             </Text>
 
-            <TouchableOpacity
-              style={styles.button}
-            >
-              <Text style={styles.buttonText}>
-                Marcar como resolvido
-              </Text>
-            </TouchableOpacity>
+            <View style={styles.buttonContainer}>
+              {item.status === 'ABERTA' && (
+                <TouchableOpacity 
+                style={styles.buttonAnalise}
+                onPress={() => 
+                  alteararStatus(item._id, 'EM_ANDAMENTO')
+                }
+                >
+                  <Text style={styles.buttonAnaliseText}>
+                    Em análise
+                  </Text>
+                </TouchableOpacity>
+              )}
+
+              {item.status !== 'RESOLVIDA' && (
+                <TouchableOpacity
+                style={styles.buttonResolvida}
+                onPress={() =>
+                  alteararStatus(item._id, 'RESOLVIDA')
+                }
+                >
+                  <Text style={styles.buttonText}>
+                    Resolver
+                  </Text>
+                </TouchableOpacity>
+              )}
+            </View>
           </View>
         )}
       />
@@ -113,7 +229,7 @@ const styles = StyleSheet.create({
   },
 
   card: {
-    backgroundColor: '#F1F5F9',
+    backgroundColor: '#FFF',
     borderRadius: 10,
     padding: 16,
     marginBottom: 14,
@@ -132,9 +248,9 @@ const styles = StyleSheet.create({
   },
 
   statusBadge: {
-    paddingHorizontal: 10,
-    paddingVertical: 6,
-    borderRadius: 8,
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    borderRadius: 6,
   },
 
   statusText: {
@@ -145,13 +261,13 @@ const styles = StyleSheet.create({
 
   tipo: {
     color: '#1E293B',
-    marginTop: 12,
+    marginTop: 4,
     fontSize: 16,
   },
 
   horario: {
     color: '#64748B',
-    marginTop: 8,
+    marginTop: 6,
     fontSize: 13,
   },
 
@@ -167,4 +283,71 @@ const styles = StyleSheet.create({
     color: '#FFF',
     fontWeight: 'bold',
   },
+
+  loading: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+
+  empty: {
+    textAlign: 'center',
+    color: '#64748B',
+    marginTop: 40,
+  },
+
+  codigo: {
+    color: '#1E40AF',
+    fontSize: 18,
+    fontWeight: 'bold',
+  },
+
+  idOnibus: {
+    color: '#1E293B',
+    fontSize: 16,
+    fontWeight: 'bold',
+    marginTop: 4,
+  },
+
+  descricao: {
+    color: '#475569',
+    marginTop: 6,
+  },
+  descricaoTitulo: {
+    fontWeight: '600',
+    color: '#1E293B',
+  },
+  buttonContainer: {
+  flexDirection: 'row',
+  marginTop: 16,
+  gap: 10,
+},
+
+buttonAnalise: {
+  flex: 1,
+  backgroundColor: '#F1F5F9',
+  paddingVertical: 11,
+  borderRadius: 8,
+  alignItems: 'center',
+  justifyContent: 'center',
+  borderWidth: 1,
+  borderColor: '#E2E8F0',
+  marginRight: 6, 
+},
+
+buttonAnaliseText: {
+  color: '#475569',
+  fontWeight: '600',
+  fontSize: 14,
+},
+
+buttonResolvida: {
+  flex: 1,
+  backgroundColor: '#1E40AF', 
+  paddingVertical: 11,
+  borderRadius: 8,
+  alignItems: 'center',
+  justifyContent: 'center',
+  marginLeft: 6,
+},
 });

@@ -10,10 +10,6 @@ export class CreateAlertaDto {
     @IsNotEmpty({ message: "Tipo não pode ser vazio" })
     tipo!: 'DESVIO_ROTA' | 'ATRASO' | 'LOTACAO' | 'OUTRO';
 
-    @IsString({ message: "Nível é obrigatório" })
-    @IsNotEmpty({ message: "Nível não pode ser vazio" })
-    nivel!: 'BAIXO' | 'MEDIO' | 'ALTO';
-
     @IsString()
     @IsOptional()
     descricao?: string;

@@ -1,7 +1,6 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { Model } from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
-
 import { Alerta, AlertaDocument } from '../schemas/alerta.schema';
 import { CreateAlertaDto } from './dto/create-alerta.dto';
 import { UpdateAlertaDto } from './dto/update-alerta.dto';
@@ -15,7 +14,8 @@ export class AlertaService {
   ) {}
 
   async listar(): Promise<Alerta[]> {
-    return this.AlertaModel.find();
+    return this.AlertaModel.find()
+    .populate('idOnibus', 'codigo placa');
   }
 
   async buscarPorId(id: string): Promise<Alerta> {
@@ -29,8 +29,31 @@ export class AlertaService {
   }
 
   async criar(dados: CreateAlertaDto): Promise<Alerta> {
-    const alerta = new this.AlertaModel(dados);
-    return alerta.save();
+    const ultimoAlerta = await this.AlertaModel
+    .findOne()
+    .sort({ codigo: -1 });
+
+    let proximoCodigo = 1;
+
+    if (ultimoAlerta?.codigo) {
+      const numeroAtual = parseInt(
+        ultimoAlerta.codigo.replace('ALE', ''),
+          10
+      );
+
+    if (!isNaN(numeroAtual)) {
+        proximoCodigo = numeroAtual + 1;
+      }
+    }
+
+    const codigo = `ALE${String(proximoCodigo).padStart(3, '0')}`;
+
+    return this.AlertaModel.create({
+        ...dados,
+        codigo,
+        status: 'NOVO',
+    });
+
   }
 
   async atualizar(id: string, data: UpdateAlertaDto): Promise<Alerta> {
