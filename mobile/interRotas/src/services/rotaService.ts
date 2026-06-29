@@ -25,3 +25,12 @@ export async function listarRotas(): Promise<Rotas[]> {
     return response.data;
 }
 
+export async function atualizarRota(id: string, dados: any): Promise<Rotas[]> {
+    const response = await api.patch(`/rotas/${id}`, dados);
+    return response.data;
+}
+
+export async function deletarRota(id: string): Promise<Rotas[]> {
+    const response = await api.delete(`/rotas/${id}`);
+    return response.data;
+}

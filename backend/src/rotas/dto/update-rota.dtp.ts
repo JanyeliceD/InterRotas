@@ -1,4 +1,19 @@
-import { PartialType } from '@nestjs/mapped-types';
-import { CreateRotaDto } from './create-rota.dto'; 
+import { IsString, IsOptional, IsNumber } from 'class-validator'; // 👈 Adicione IsNumber aqui
 
-export class UpdateRotaDto extends PartialType(CreateRotaDto) {}
+export class UpdateRotaDto {
+  @IsString()
+  @IsOptional()
+  nome?: string;
+
+  @IsString()
+  @IsOptional()
+  motorista?: string;
+
+  @IsString()
+  @IsOptional()
+  onibus?: string;
+
+  @IsNumber() // 👈 Garante que o NestJS valide como número
+  @IsOptional()
+  quilometragem?: number; // 👈 Adicionado aqui
+}

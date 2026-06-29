@@ -4,8 +4,8 @@ import {
     Param, 
     Post,
     Body,
-    Patch,
-    Delete 
+    Delete, 
+    Patch
 } from '@nestjs/common';
 import {RotasService} from './rotas.service';
 import { CreateRotaDto } from './dto/create-rota.dto';

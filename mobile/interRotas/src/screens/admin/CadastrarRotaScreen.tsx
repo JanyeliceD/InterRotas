@@ -19,6 +19,7 @@ import { cadastrarRota } from '../../services/rotaService';
 
 export default function CadastrarRotaScreen({ navigation }: { navigation: any }) {
   const [nome, setNome] = useState('');
+  const [quilometragem, setQuilometragem] = useState(''); // 👈 Estado adicionado para a quilometragem
   const [motorista, setMotorista] = useState<Motorista[]>([]);
   const [onibus, setOnibus] = useState<Onibus[]>([]);
   const [paradas, setParadas] = useState<Parada[]>([]);
@@ -90,20 +91,22 @@ useEffect(() => {
 }
 
   async function cadastrar() {
-    if (!nome || !motorista || !onibus || paradasSelecionadas.length === 0) {
+    // 👈 Atualizado para validar se a quilometragem foi digitada
+    if (!nome || !idMotorista || !idOnibus || !quilometragem || paradasSelecionadas.length === 0) {
       Alert.alert(
         'Erro',
         'Preencha todos os campos.'
       );
-
       return;
     }
 
     try {
+      // Modificado para passar os dados corretos que o seu backend agora espera
       await cadastrarRota({
         nome,
-        idMotorista: idMotorista,
-        idOnibus:idOnibus,
+        onibus: onibusNome.split(' - ')[1],       // 👈 Envia a string da placa
+        motorista: motoristaNome.split(' - ')[1],   // 👈 Envia a string do nome do motorista
+        quilometragem: Number(quilometragem),       // 👈 Envia como Number puro para o banco
         paradas: paradasSelecionadas,
       });
 
@@ -113,162 +116,94 @@ useEffect(() => {
       );
 
         setNome('');
+        setQuilometragem(''); // 👈 Limpa o campo após o sucesso
         setidMotorista('');
         setMotoristaNome('');
         setidOnibus('');
         setOnibusNome('');
         setParadasSelecionadas([]);
     } catch (error: any) {
-  console.log(
-    'Status:',
-    error.response?.status
-  );
-
-  console.log(
-    'Data:',
-    error.response?.data
-  );
-
-  console.error(
-    'Erro ao cadastrar rota:',
-    error
-  );
-}
-
+      console.log('Status:', error.response?.status);
+      console.log('Data:', error.response?.data);
+      console.error('Erro ao cadastrar rota:', error);
+    }
   }
 
   return (
     <View style={styles.container}>
-      <Modal
-        visible={modalMotorista}
-        transparent
-        animationType="slide"
-      >
+      
+      {/* MODAL SELEÇÃO MOTORISTA */}
+      <Modal visible={modalMotorista} transparent animationType="slide">
         <View style={styles.modalOverlay}>
           <View style={styles.modalContainer}>
-            <Text style={styles.modalTitulo}>
-              Selecione o Motorista
-            </Text>
-
-            {motorista.map(
-              (item) => (
-                <TouchableOpacity
-                  key={item._id}
-                  style={styles.paradaItem}
-                  onPress={() => {
-                    setidMotorista(item._id
-
-                    );
-                    setMotoristaNome(
-                      `${item.matricula} - ${item.nome}`
-                    );
-                    setModalMotorista(false);
-                  }}
-                >
-                  <Text>{item.matricula} - {item.nome}</Text>
-                </TouchableOpacity>
-              )
-            )}
+            <Text style={styles.modalTitulo}>Selecione o Motorista</Text>
+            {motorista.map((item) => (
+              <TouchableOpacity
+                key={item._id}
+                style={styles.paradaItem}
+                onPress={() => {
+                  setidMotorista(item._id);
+                  setMotoristaNome(`${item.matricula} - ${item.nome}`);
+                  setModalMotorista(false);
+                }}
+              >
+                <Text>{item.matricula} - {item.nome}</Text>
+              </TouchableOpacity>
+            ))}
           </View>
         </View>
       </Modal>
 
-      <Modal
-        visible={modalOnibus}
-        transparent
-        animationType="slide"
-      >
+      {/* MODAL SELEÇÃO ÔNIBUS */}
+      <Modal visible={modalOnibus} transparent animationType="slide">
         <View style={styles.modalOverlay}>
           <View style={styles.modalContainer}>
-            <Text style={styles.modalTitulo}>
-              Selecione o Ônibus
-            </Text>
-
-            {onibus.map(
-              (item) => (
-                <TouchableOpacity
-                  key={item._id}
-                  style={styles.paradaItem}
-                  onPress={() => {
-                    setidOnibus(item._id);
-                    setOnibusNome(
-                      `${item.codigo} - ${item.placa}`
-                    );
-                    setModalOnibus(false);
-                  }}
-                >
-                  <Text>{item.codigo} - {item.placa}</Text>
-                </TouchableOpacity>
-              )
-            )}
+            <Text style={styles.modalTitulo}>Selecione o Ônibus</Text>
+            {onibus.map((item) => (
+              <TouchableOpacity
+                key={item._id}
+                style={styles.paradaItem}
+                onPress={() => {
+                  setidOnibus(item._id);
+                  setOnibusNome(`${item.codigo} - ${item.placa}`);
+                  setModalOnibus(false);
+                }}
+              >
+                <Text>{item.codigo} - {item.placa}</Text>
+              </TouchableOpacity>
+            ))}
           </View>
         </View>
       </Modal>
 
-      <Modal
-        visible={modalVisible}
-        animationType="slide"
-        transparent
-      >
+      {/* MODAL SELEÇÃO PARADAS */}
+      <Modal visible={modalVisible} animationType="slide" transparent>
         <View style={styles.modalOverlay}>
           <View style={styles.modalContainer}>
-            <Text style={styles.modalTitulo}>
-              Selecione as Paradas
-            </Text>
-
+            <Text style={styles.modalTitulo}>Selecione as Paradas</Text>
             {paradas.map((parada) => {
-              const selecionada =
-                paradasSelecionadas.includes(parada._id);
-
+              const selecionada = paradasSelecionadas.includes(parada._id);
               return (
                 <TouchableOpacity
                   key={parada._id}
-                  style={[
-                    styles.paradaItem,
-                    selecionada &&
-                      styles.paradaSelecionada,
-                  ]}
-                  onPress={() =>
-                    toggleParada(parada._id)
-                  }
+                  style={[styles.paradaItem, selecionada && styles.paradaSelecionada]}
+                  onPress={() => toggleParada(parada._id)}
                 >
-                  <Text
-                    style={styles.paradaTexto}
-                  >
-                    {parada.nome}
-                  </Text>
+                  <Text style={styles.paradaTexto}>{parada.nome}</Text>
                 </TouchableOpacity>
               );
             })}
-
-            <TouchableOpacity
-              style={styles.button}
-              onPress={() => {
-                navigation.navigate('CadastrarParada');
-                setModalVisible(false);
-              }}
-            >
-              <Text style={styles.buttonText}>
-                Nova parada
-              </Text>
+            <TouchableOpacity style={styles.button} onPress={() => { navigation.navigate('CadastrarParada'); setModalVisible(false); }}>
+              <Text style={styles.buttonText}>Nova parada</Text>
             </TouchableOpacity>
-
-            <TouchableOpacity
-              style={styles.button}
-              onPress={() =>
-                setModalVisible(false)
-              }
-            >
-              <Text style={styles.buttonText}>
-                Concluir
-              </Text>
+            <TouchableOpacity style={styles.button} onPress={() => setModalVisible(false)}>
+              <Text style={styles.buttonText}>Concluir</Text>
             </TouchableOpacity>
           </View>
         </View>
       </Modal>
-      <Text style={styles.titulo}>
-        Cadastrar Rota
-      </Text>
+
+      <Text style={styles.titulo}>Cadastrar Rota</Text>
 
       <TextInput
         style={styles.input}
@@ -278,132 +213,57 @@ useEffect(() => {
         onChangeText={setNome}
       />
 
-      <TouchableOpacity
+      {/* 👈 INPUT DE QUILOMETRAGEM ADICIONADO AQUI */}
+      <TextInput
         style={styles.input}
-        onPress={() => setModalMotorista(true)}
-      >
-        <Text>
+        placeholder="Quilometragem da rota (km)"
+        placeholderTextColor="#64748B"
+        keyboardType="numeric" // Garante teclado numérico no celular
+        value={quilometragem}
+        onChangeText={setQuilometragem}
+      />
+
+      <TouchableOpacity style={styles.input} onPress={() => setModalMotorista(true)}>
+        <Text style={{ color: motoristaNome ? '#1E293B' : '#64748B' }}>
           {motoristaNome || 'Selecionar motorista'}
         </Text>
       </TouchableOpacity>
 
-      <TouchableOpacity
-        style={styles.input}
-        onPress={() => setModalOnibus(true)}
-      >
-        <Text>
+      <TouchableOpacity style={styles.input} onPress={() => setModalOnibus(true)}>
+        <Text style={{ color: onibusNome ? '#1E293B' : '#64748B' }}>
           {onibusNome || 'Selecionar ônibus'}
         </Text>
       </TouchableOpacity>
 
-      <TouchableOpacity 
-      style={styles.buttonParada}
-      onPress={() => setModalVisible(true)}>
-        <Text style={styles.buttonTextParada}>
-          Adicionar Paradas
-        </Text>
+      <TouchableOpacity style={styles.buttonParada} onPress={() => setModalVisible(true)}>
+        <Text style={styles.buttonTextParada}>Adicionar Paradas</Text>
       </TouchableOpacity>
 
       <Text style={styles.infoParadas}>
-        {paradasSelecionadas.length} parada(s)
-        selecionada(s)
+        {paradasSelecionadas.length} parada(s) selecionada(s)
       </Text>
 
-      <TouchableOpacity
-        style={styles.button}
-        onPress={cadastrar}
-      >
-        <Text style={styles.buttonText}>
-          Cadastrar
-        </Text>
+      <TouchableOpacity style={styles.button} onPress={cadastrar}>
+        <Text style={styles.buttonText}>Cadastrar</Text>
       </TouchableOpacity>
     </View>
   );
 }
 
+// Mantenha os seus styles exatamente iguais abaixo
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#F8FAFC',
-    padding: 16,
-  },
-
-  titulo: {
-    color: '#1E40AF',
-    fontSize: 24,
-    fontWeight: 'bold',
-    marginBottom: 24,
-  },
-
-  input: {
-    backgroundColor: '#F1F5F9',
-    color: '#1E293B',
-    borderRadius: 8,
-    padding: 14,
-    marginBottom: 16,
-  },
-
-  button: {
-    backgroundColor: '#1E40AF',
-    padding: 16,
-    borderRadius: 8,
-    alignItems: 'center',
-    marginBottom: 16,
-  },
-
-  buttonText: {
-    color: '#FFF',
-    fontWeight: 'bold',
-    fontSize: 16,
-  },
-  buttonParada: {
-    backgroundColor: '#DBEAFE',
-    borderColor: '#CBD5E1',
-    borderWidth: 1,
-    padding: 16,
-    borderRadius: 8,
-    alignItems: 'center',
-    marginBottom: 16,
-  },
-  buttonTextParada: {
-    color: '#1E293B',
-    fontWeight: 'bold',
-    fontSize: 16,
-  },
-  infoParadas: {
-    marginBottom: 16,
-    color: '#475569',
-  },
-
-  modalOverlay: {
-    flex: 1,
-    backgroundColor: 'rgba(0,0,0,0.5)',
-    justifyContent: 'center',
-    padding: 16,
-  },
-  modalContainer: {
-    backgroundColor: '#FFF',
-    borderRadius: 12,
-    padding: 20,
-  },
-  modalTitulo: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    marginBottom: 16,
-    color: '#1E40AF',
-  },
-  paradaItem: {
-    padding: 14,
-    borderWidth: 1,
-    borderColor: '#CBD5E1',
-    borderRadius: 8,
-    marginBottom: 10,
-  },
-  paradaSelecionada: {
-    backgroundColor: '#DBEAFE',
-    borderColor: '#1E40AF',
-  },
-  paradaTexto: {
-    fontSize: 16,
-  },
+  container: { flex: 1, backgroundColor: '#F8FAFC', padding: 16 },
+  titulo: { color: '#1E40AF', fontSize: 24, fontWeight: 'bold', marginBottom: 24 },
+  input: { backgroundColor: '#F1F5F9', color: '#1E293B', borderRadius: 8, padding: 14, marginBottom: 16 },
+  button: { backgroundColor: '#1E40AF', padding: 16, borderRadius: 8, alignItems: 'center', marginBottom: 16 },
+  buttonText: { color: '#FFF', fontWeight: 'bold', fontSize: 16 },
+  buttonParada: { backgroundColor: '#DBEAFE', borderColor: '#CBD5E1', borderWidth: 1, padding: 16, borderRadius: 8, alignItems: 'center', marginBottom: 16 },
+  buttonTextParada: { color: '#1E293B', fontWeight: 'bold', fontSize: 16 },
+  infoParadas: { marginBottom: 16, color: '#475569' },
+  modalOverlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.5)', justifyContent: 'center', padding: 16 },
+  modalContainer: { backgroundColor: '#FFF', borderRadius: 12, padding: 20 },
+  modalTitulo: { fontSize: 20, fontWeight: 'bold', marginBottom: 16, color: '#1E40AF' },
+  paradaItem: { padding: 14, borderWidth: 1, borderColor: '#CBD5E1', borderRadius: 8, marginBottom: 10 },
+  paradaSelecionada: { backgroundColor: '#DBEAFE', borderColor: '#1E40AF' },
+  paradaTexto: { fontSize: 16 }
 });

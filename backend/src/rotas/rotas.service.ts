@@ -4,7 +4,7 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Rota, RotaDocument } from 'src/schemas/rota.schema';
 import { CreateRotaDto } from './dto/create-rota.dto';
 import { UpdateRotaDto } from './dto/update-rota.dtp';
-
+import { Types } from 'mongoose';
 @Injectable()
 export class RotasService {
 
@@ -70,20 +70,24 @@ async listar(codigo?: string, nome?: string) {
     return novaRota.save();
   }
 
-  async atualizar(id: string, dados: UpdateRotaDto): Promise<Rota> {
-    const rota = await this.rotaModel.findByIdAndUpdate(id, dados, {
-      new: true, // retorna o atualizado
-    });
 
-    if (!rota) {
-      throw new NotFoundException('Rota não encontrada');
+async atualizar(id: string, updateRotaDto: any) {
+    const rotaAtualizada = await this.rotaModel
+        .findByIdAndUpdate(
+            id, 
+            updateRotaDto, 
+            { returnDocument: 'after' }
+        )
+        .exec(); // Sem populate, porque agora é string direto na rota!
+
+    if (!rotaAtualizada) {
+        throw new NotFoundException('Rota não encontrada');
     }
 
-    return rota;
-  }
-
+    return rotaAtualizada;
+}
   async remover(id: string): Promise<Rota> {
-    const rota = await this.rotaModel.findByIdAndDelete(id);
+    const rota = await this.rotaModel.findByIdAndDelete(id).exec();
 
     if (!rota) {
       throw new NotFoundException('Rota não encontrada');

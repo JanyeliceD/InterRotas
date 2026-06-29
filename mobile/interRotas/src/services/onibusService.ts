@@ -1,5 +1,16 @@
 import { api } from './api';
-import { Onibus, CreateOnibusDto } from '../types/onibus';
+
+export interface Onibus {
+    _id: string;
+    codigo: string;
+    placa: string;
+}
+
+export interface CreateOnibusDto {
+    placa: string;
+    modelo: string;
+    capacidade: number;
+}
 
 export async function listarOnibus(): Promise<Onibus[]> {
     const response = await api.get<Onibus[]>('/onibus');

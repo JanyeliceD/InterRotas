@@ -1,5 +1,18 @@
 import { api } from './api';
-import { Motorista, CreateMotoristaDto } from '../types/motorista';
+
+export interface Motorista {
+    _id: string;
+    matricula: string;
+    nome: string;
+}
+
+export interface CreateMotoristaDto {
+    nome: string;
+    cpf: string;
+    cnh: string;
+    email: string;
+    telefone: string;
+}
 
 export async function listarMotoristas(): Promise<Motorista[]> {
     const response = await api.get<Motorista[]>('/motorista');
