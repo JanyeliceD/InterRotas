@@ -5,13 +5,34 @@ import { Rota, RotaDocument } from 'src/schemas/rota.schema';
 import { CreateRotaDto } from './dto/create-rota.dto';
 import { UpdateRotaDto } from './dto/update-rota.dtp';
 import { Types } from 'mongoose';
+import { ConfigService } from '../config/config.service';
 @Injectable()
 export class RotasService {
 
   constructor(
-    @InjectModel(Rota.name) private rotaModel: Model<RotaDocument>
+    @InjectModel(Rota.name) private rotaModel: Model<RotaDocument>,
+    private readonly configService: ConfigService,
   ) {}
 
+  async listarRotasComCalculoCombustivel() {
+    const rotas = await this.rotaModel.find().exec();
+    
+    // Busca o preço atualizado direto do banco através do outro service!
+    const config = await this.configService.obterPrecoDiesel();
+    const precoDiesel = config.precoDiesel;
+    const mediaKmL = 3.5;
+
+    return rotas.map(rota => {
+      const litros = (rota.quilometragem || 0) / mediaKmL;
+      const custo = litros * precoDiesel;
+
+      return {
+        ...rota.toObject(),
+        dieselEstimado: parseFloat(litros.toFixed(1)),
+        custoTotal: parseFloat(custo.toFixed(2))
+      };
+    });
+  }
 async listar(codigo?: string, nome?: string) {
     let resultado = await this.rotaModel.find();
 

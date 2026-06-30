@@ -39,5 +39,6 @@ export class RotasController {
     remover(@Param('id') id: string) {
         return this.rotasService.remover(id);
     }
+    
 
 }
