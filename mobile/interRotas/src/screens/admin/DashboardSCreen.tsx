@@ -9,6 +9,8 @@ import {
   Alert 
 } from 'react-native';
 import { useState, useEffect } from 'react';
+import MapView from 'react-native-maps'; 
+import Mapa from '../../components/Mapa'; // Certifique-se de que o caminho está correto
 
 // 1. Importa a função do serviço que criamos e a interface de tipagem
 import { listarRotas, Rotas } from '../../services/rotaService'; // Ajuste o caminho da pasta se necessário
@@ -51,7 +53,7 @@ export default function DashboardScreen() {
   // O filtro agora varre a lista 'rotas' dinâmica preenchida pelo backend
   const rotasFiltradas = rotas.filter((rota) =>  
     rota.nome?.toLowerCase().includes(busca.toLowerCase()) ||
-    rota.motorista?.toLowerCase().includes(busca.toLowerCase())
+    rota.idMotorista?.toLowerCase().includes(busca.toLowerCase())
   );
 
   // Exibe tela de carregamento inicial enquanto o backend responde
@@ -80,7 +82,13 @@ export default function DashboardScreen() {
         />
       </View>
 
-      <View style={styles.mapContainer}></View>
+      <View style={styles.mapContainer}>
+         <Mapa 
+         latitude={-6.046}
+         longitude={-36.347}
+         titulo="Ônibus 1"
+         />
+      </View>
      
       <View style={styles.listSection}>
         <Text style={styles.listTitle}>Rotas Ativas ({rotasFiltradas.length})</Text>
@@ -106,7 +114,7 @@ export default function DashboardScreen() {
                 </Text>
                 
                 <Text style={styles.rotaDetalhe}>
-                  <Text style={styles.boldText}>Motorista: </Text>{item.motorista}
+                  <Text style={styles.boldText}>Motorista: </Text>{item.idMotorista}
                 </Text>
 
                 <Text style={styles.rotaDetalhe}>
@@ -143,8 +151,9 @@ export default function DashboardScreen() {
 
 const styles = StyleSheet.create({
   mapContainer: {
-    height: 120,
+    height: 200,
     width: '100%',
+    flex: 1,
   },
   container: {
     flex: 1,
