@@ -11,6 +11,8 @@ import {
 import { useState, useEffect } from 'react';
 import MapView from 'react-native-maps'; 
 import Mapa from '../../components/Mapa'; // Certifique-se de que o caminho está correto
+import { Localizacao } from '../../services/localizacaoService'; 
+import { listarLocalizacoes } from '../../services/localizacaoService';
 
 // 1. Importa a função do serviço que criamos e a interface de tipagem
 import { listarRotas, Rotas } from '../../services/rotaService'; // Ajuste o caminho da pasta se necessário
@@ -21,6 +23,8 @@ export default function DashboardScreen() {
   // 2. Estados para armazenar as rotas vindas do BD e gerenciar o carregamento
   const [rotas, setRotas] = useState<Rotas[]>([]);
   const [carregando, setCarregando] = useState(true);
+
+  const [todosOsOnibus, setTodosOsOnibus] = useState<Localizacao[]>([]);
 
   // 3. Função que chama o serviço Axios
   const buscarRotasDoBackend = async () => {
@@ -56,6 +60,22 @@ export default function DashboardScreen() {
     rota.idMotorista?.toLowerCase().includes(busca.toLowerCase())
   );
 
+  //MAPA
+  useEffect(() => {
+    carregarMapa();
+
+    const intervalo = setInterval(() => {
+      carregarMapa();
+    }, 10000); // Atualiza a cada 10 segundos
+
+    return () => clearInterval(intervalo);
+  }, []);
+
+  async function carregarMapa() {
+    const dados = await listarLocalizacoes();
+    setTodosOsOnibus(dados);
+}
+
   // Exibe tela de carregamento inicial enquanto o backend responde
   if (carregando && rotas.length === 0) {
     return (
@@ -84,9 +104,10 @@ export default function DashboardScreen() {
 
       <View style={styles.mapContainer}>
          <Mapa 
-         latitude={-6.046}
-         longitude={-36.347}
-         titulo="Ônibus 1"
+         localizacoes={todosOsOnibus}
+         mostrarOnibus={true}
+          mostrarParadas={false}
+          mostrarRota={false}
          />
       </View>
      

@@ -17,6 +17,9 @@ export class Localizacao {
 
     @Prop({ required: true })
     longitude!: number;
+
+    @Prop({ default: Date.now })
+    dataAtualizacao!: Date;
 }
 
 export const LocalizacaoSchema = SchemaFactory.createForClass(Localizacao);

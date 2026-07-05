@@ -49,4 +49,10 @@ export class LocalizacaoService {
             })
             .sort({ timestamp: -1 });
     }
+
+    async listar() {
+    return this.localizacaoModel
+        .find()
+        .populate('idOnibus');
+    }
 }

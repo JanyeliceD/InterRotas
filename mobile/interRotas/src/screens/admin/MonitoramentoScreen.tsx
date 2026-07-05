@@ -5,6 +5,9 @@ import { useState, useEffect } from 'react';
 import { listarRotas, atualizarRota, deletarRota, Rotas } from '../../services/rotaService'; 
 import { listarMotoristas, Motorista } from '../../services/motoristaService';
 import { listarOnibus, Onibus } from '../../services/onibusService';
+import Mapa from '../../components/Mapa';
+import { Localizacao } from '../../services/localizacaoService';
+import { listarLocalizacoes } from '../../services/localizacaoService';
 
 export default function MonitoramentoScreen() {
   const [busca, setBusca] = useState('');
@@ -88,6 +91,24 @@ export default function MonitoramentoScreen() {
     setModalEditarVisivel(true);
   }
 
+  const [localizacoes, setLocalizacoes] = useState<Localizacao[]>([]);
+
+    //MAPA
+    useEffect(() => {
+      carregarMapa();
+  
+      const intervalo = setInterval(() => {
+        carregarMapa();
+      }, 10000); // Atualiza a cada 10 segundos
+  
+      return () => clearInterval(intervalo);
+    }, []);
+  
+    async function carregarMapa() {
+      const dados = await listarLocalizacoes();
+      setLocalizacoes(dados);
+  }
+
 async function lidarComDeletar(id: string) {
     console.log('====== INICIANDO PROCESSO DE EXCLUSÃO ======');
     console.log('ID enviado para o Service:', id);
@@ -168,6 +189,15 @@ async function lidarComDeletar(id: string) {
             <Text style={styles.modalTitle}>📋 Relatório da Rota</Text>
             {rotaSelecionada && (
               <View style={styles.modalBody}>
+                {/* MAPA */}
+                <View style={styles.mapContainer}>
+                  <Mapa 
+                  localizacoes={localizacoes}
+                  mostrarOnibus={true}
+                  mostrarParadas={true}
+                  mostrarRota={true}
+                  />
+                </View>
                 <Text style={styles.modalTextoLinha}><Text style={styles.boldText}>Linha: </Text>{rotaSelecionada.nome}</Text>
                 <Text style={styles.modalTexto}>
                   <Text style={styles.boldText}>Veículo/Placa: </Text>
@@ -375,5 +405,11 @@ const styles = StyleSheet.create({
   subModalTitle: { fontSize: 16, fontWeight: '700', color: '#1E293B', marginBottom: 14, textAlign: 'center' },
   itemSelecao: { paddingVertical: 14, borderBottomWidth: 1, borderColor: '#F1F5F9' },
   itemSelecaoTexto: { fontSize: 15, color: '#334155' },
-  botaoCancelarSeletor: { backgroundColor: '#64748B', paddingVertical: 12, borderRadius: 8, alignItems: 'center', marginTop: 10 }
+  botaoCancelarSeletor: { backgroundColor: '#64748B', paddingVertical: 12, borderRadius: 8, alignItems: 'center', marginTop: 10 },
+  mapContainer: {
+    height: 300,
+    borderRadius: 12,
+    overflow: 'hidden',
+    marginBottom: 12,
+  },
 });
