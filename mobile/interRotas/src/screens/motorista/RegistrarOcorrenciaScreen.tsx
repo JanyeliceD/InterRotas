@@ -170,7 +170,8 @@ const styles = StyleSheet.create({
     padding: 14,
     height: 100,
     textAlignVertical: 'top',
-    marginTop: 12,
+    marginTop: 8,
+    marginBottom: 100,
   },
 
   button: {
@@ -178,7 +179,8 @@ const styles = StyleSheet.create({
     padding: 16,
     borderRadius: 8,
     alignItems: 'center',
-    marginTop: 24,
+    marginTop: 14,
+    marginBottom: 56,
   },
 
   buttonText: {

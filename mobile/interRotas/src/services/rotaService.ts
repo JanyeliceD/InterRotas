@@ -1,10 +1,11 @@
 import { api } from './api'
+import { Parada } from '../types/parada';
 
 export interface CreateRotaDto {
     nome: string;
     idMotorista: string;
     idOnibus: string;
-    paradas: string[];
+    paradas: Parada[];
 }
 
 export interface Rotas {

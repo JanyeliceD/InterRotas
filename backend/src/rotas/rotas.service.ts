@@ -34,7 +34,11 @@ export class RotasService {
     });
   }
 async listar(codigo?: string, nome?: string) {
-    let resultado = await this.rotaModel.find();
+    let resultado = await this.rotaModel
+    .find()
+    .populate('idMotorista', 'nome')
+    .populate('idOnibus', 'codigo placa')
+    .populate('paradas', 'nome latitude longitude');
 
     if (codigo) {
         resultado = resultado.filter(

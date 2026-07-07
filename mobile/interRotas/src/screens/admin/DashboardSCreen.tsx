@@ -131,7 +131,7 @@ export default function DashboardScreen() {
                 <Text style={styles.rotaNome} numberOfLines={1}>{item.nome}</Text>
                 
                 <Text style={styles.rotaDetalhe}>
-                  <Text style={styles.boldText}>Veículo: </Text>{item.onibus}
+                  <Text style={styles.boldText}>Veículo: BUS001</Text>
                 </Text>
                 
                 <Text style={styles.rotaDetalhe}>

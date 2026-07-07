@@ -86,7 +86,7 @@ export default function ConfigScreen() {
         // Renderização dos CARDS FINANCEIROS DINÂMICOS 💳
         renderItem={({ item }) => (
           <View style={styles.consumoCard}>
-            <Text style={styles.rotaNome}>📍 {item.nome}</Text>
+            <Text style={styles.rotaNome}>{item.nome}</Text>
             
             <View style={styles.divider} />
             
@@ -116,7 +116,7 @@ export default function ConfigScreen() {
           <>
             <View style={styles.cardSecao}>
               <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
-                <Text style={styles.secaoTitle}>⛽ Controle de Combustível</Text>
+                <Text style={styles.secaoTitle}>Controle de Combustível</Text>
                 {carregando && <ActivityIndicator size="small" color="#1E40AF" />}
               </View>
               
@@ -146,7 +146,7 @@ export default function ConfigScreen() {
               </Pressable>
             </View>
 
-            <Text style={styles.secaoTitleLista}>📊 Estimativa de Despesa Mensal por Rota</Text>
+            <Text style={styles.secaoTitleLista}>Estimativa de Despesa Mensal por Rota</Text>
           </>
         }
         ListFooterComponent={<View style={{ height: 30 }} />}

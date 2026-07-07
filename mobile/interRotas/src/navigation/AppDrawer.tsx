@@ -1,11 +1,12 @@
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { createDrawerNavigator } from '@react-navigation/drawer';
-import OcorrenciasScreen from '../screens/admin/OcorrenciasScreen';
 import TabNavigator from './TabNavigator';
+import ConfigScreen from '../screens/admin/ConfigCusto';
+import TabStack from './TabStack';
 
 export type RootDrawerParamList = {
   PainelPrincipal: undefined;
-  Ocorrencias: undefined;
+  Config: undefined;
 };
 
 const Drawer = createDrawerNavigator<RootDrawerParamList>();
@@ -24,7 +25,7 @@ export function AppDrawer() {
             name={
               route.name === 'PainelPrincipal'
                 ? focused ? 'grid' : 'grid-outline'
-                : focused ? 'notifications' : 'notifications-outline'
+                : focused ? 'settings' : 'settings-outline'
             }
             color={color}
             size={size}
@@ -34,13 +35,14 @@ export function AppDrawer() {
     >
       <Drawer.Screen
         name="PainelPrincipal"
-        component={TabNavigator}
+        component={TabStack}
         options={{ title: 'Painel', headerShown: false }}
       />
+
       <Drawer.Screen
-        name="Ocorrencias"
-        component={OcorrenciasScreen}
-        options={{ title: 'Ocorrências' }}
+        name="Config"
+        component={ConfigScreen}
+        options={{ title: 'Configurações' }}
       />
     </Drawer.Navigator>
   );
