@@ -5,7 +5,7 @@ import { AlertaModule } from './alerta/alerta.module';
 import { OnibusModule } from './onibus/onibus.module';
 import { ParadasModule } from './paradas/paradas.module';
 import { RotasModule } from './rotas/rotas.module';
-
+import { usersModule } from './users/users.module';
 // 1. IMPORTAÇÃO DO NESTJS CONFIG AJUSTADA:
 // Importamos o módulo (com apelido) E o ConfigService (que o Mongoose usa para ler o .env)
 import { ConfigModule as NestConfigModule, ConfigService } from '@nestjs/config'; 
@@ -37,7 +37,9 @@ import { ConfigModule as MinhaConfigModule } from './config/config.module';
     LocalizacaoModule, 
     MotoristaModule, 
     OcorrenciaModule,
-    MinhaConfigModule
+    MinhaConfigModule,
+    usersModule
+
   ],
   controllers: [AppController],
   providers: [AppService],

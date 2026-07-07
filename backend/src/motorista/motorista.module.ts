@@ -11,6 +11,7 @@ import { Motorista, MotoristaSchema } from '../schemas/motorista.schema';
     ])
   ],
   controllers: [MotoristaController],
-  providers: [MotoristaService]
+  providers: [MotoristaService],
+
 })
 export class MotoristaModule {}
