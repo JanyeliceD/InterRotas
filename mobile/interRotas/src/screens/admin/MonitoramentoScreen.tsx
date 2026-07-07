@@ -186,13 +186,14 @@ async function lidarComDeletar(id: string) {
       <Modal animationType="fade" transparent={true} visible={modalDetalhesVisivel} onRequestClose={() => setModalDetalhesVisivel(false)}>
         <View style={styles.modalOverlay}>
           <View style={styles.modalContent}>
-            <Text style={styles.modalTitle}>📋 Relatório da Rota</Text>
+            <Text style={styles.modalTitle}>Relatório da Rota</Text>
             {rotaSelecionada && (
               <View style={styles.modalBody}>
                 {/* MAPA */}
                 <View style={styles.mapContainer}>
                   <Mapa 
                   localizacoes={localizacoes}
+                  paradas={rotaSelecionada.paradas || []}
                   mostrarOnibus={true}
                   mostrarParadas={true}
                   mostrarRota={true}
@@ -200,17 +201,17 @@ async function lidarComDeletar(id: string) {
                 </View>
                 <Text style={styles.modalTextoLinha}><Text style={styles.boldText}>Linha: </Text>{rotaSelecionada.nome}</Text>
                 <Text style={styles.modalTexto}>
-                  <Text style={styles.boldText}>Veículo/Placa: </Text>
-                  {typeof rotaSelecionada.idOnibus === 'object' ? rotaSelecionada.idOnibus?.placa : (rotaSelecionada.idOnibus || rotaSelecionada.onibus || 'Não informado')}
+                  <Text style={styles.boldText}>Veículo/Placa: BUS002</Text>
+
                 </Text>
                 <Text style={styles.modalTexto}>
                   <Text style={styles.boldText}>Motorista: </Text>
                   {typeof rotaSelecionada.idMotorista === 'object' ? rotaSelecionada.idMotorista?.nome : (rotaSelecionada.idMotorista || rotaSelecionada.motorista || 'Não informado')}
                 </Text>
                 <View style={styles.divisor} />
-                <Text style={styles.modalTexto}><Text style={styles.boldText}>🛣️ Odômetro: </Text>{rotaSelecionada.quilometragem || 0} km</Text>
-                <Text style={styles.modalTexto}><Text style={styles.boldText}>⛽ Diesel Estimado: </Text>{((rotaSelecionada.quilometragem || 0) / mediaKmL).toFixed(1)} L</Text>
-                <Text style={styles.modalTextoFin}><Text style={styles.boldText}>💰 Custo Total: </Text>R$ {(((rotaSelecionada.quilometragem || 0) / mediaKmL) * precoDiesel).toFixed(2)}</Text>
+                <Text style={styles.modalTexto}><Text style={styles.boldText}>Odômetro: </Text>{rotaSelecionada.quilometragem || 0} km</Text>
+                <Text style={styles.modalTexto}><Text style={styles.boldText}>Diesel Estimado: </Text>{((rotaSelecionada.quilometragem || 0) / mediaKmL).toFixed(1)} L</Text>
+                <Text style={styles.modalTextoFin}><Text style={styles.boldText}>Custo Total: </Text>R$ {(((rotaSelecionada.quilometragem || 0) / mediaKmL) * precoDiesel).toFixed(2)}</Text>
               </View>
             )}
             <Pressable style={styles.botaoFecharModal} onPress={() => setModalDetalhesVisivel(false)}>
@@ -224,7 +225,7 @@ async function lidarComDeletar(id: string) {
       <Modal animationType="slide" transparent={true} visible={modalEditarVisivel} onRequestClose={() => setModalEditarVisivel(false)}>
         <View style={styles.modalOverlay}>
           <View style={styles.modalContent}>
-            <Text style={styles.modalTitle}>📝 Editar Rota</Text>
+            <Text style={styles.modalTitle}>Editar Rota</Text>
 
             <Text style={styles.inputLabel}>Nome da Linha</Text>
             <TextInput style={styles.modalInput} value={nomeEditando} onChangeText={setNomeEditando} />
