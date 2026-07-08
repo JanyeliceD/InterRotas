@@ -17,14 +17,14 @@ export class OnibusService {
     if (placa) {
         resultado = resultado.filter(
             (onibus) =>
-                onibus.placa === placa,
+                onibus.placa === placa
         );
     }
 
     if (modelo) {
         resultado = resultado.filter(
             (onibus) =>
-                onibus.modelo === modelo,
+                onibus.modelo === modelo
         );
     }
 

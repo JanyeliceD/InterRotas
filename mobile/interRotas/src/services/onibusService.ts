@@ -23,3 +23,19 @@ export async function cadastrarOnibus(dados: CreateOnibusDto): Promise<Onibus> {
 
     return response.data;
 }
+
+export async function buscarOnibusPorPlaca(
+  placa: string
+): Promise<Onibus | null> {
+  const response = await api.get<Onibus[]>('/onibus', {
+    params: {
+      placa,
+    },
+  });
+
+  if (response.data.length === 0) {
+    return null;
+  }
+
+  return response.data[0];
+}

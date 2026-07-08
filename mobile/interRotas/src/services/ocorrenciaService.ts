@@ -6,15 +6,36 @@ export type Onibus = {
     placa: string;
 }
 
+export type TipoOcorrencia = 
+    | 'FALHA_MECANICA' 
+    | 'PNEU_FURADO' 
+    | 'ACIDENTE' 
+    | 'TRANSITO' 
+    | 'OUTRO';
+
 export interface Ocorrencia {
     _id: string;
     codigo: string;
     idOnibus: Onibus;
-    tipo: 'FALHA_MECANICA' | 'PNEU_FURADO' | 'ACIDENTE' | 'TRANSITO' | 'OUTRO';
+    tipo: TipoOcorrencia;
     descricao?: string;
     status: 'ABERTA' | 'EM_ANDAMENTO' | 'RESOLVIDA';
     dataCriacao: Date;
     observacaoAdmin?: string;
+}
+
+export async function registrarOcorrencia(
+    idOnibus: string,
+    tipo: 'FALHA_MECANICA' | 'PNEU_FURADO' | 'ACIDENTE' | 'TRANSITO' | 'OUTRO',
+    descricao?: string
+): Promise<Ocorrencia> {
+    const response = await api.post<Ocorrencia>('/ocorrencia', {
+        idOnibus,
+        tipo,
+        descricao,
+    });
+
+    return response.data;
 }
 
 export async function listarOcorrencias(): Promise<Ocorrencia[]> {

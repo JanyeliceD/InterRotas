@@ -6,32 +6,83 @@ import {
   TouchableOpacity,
   Alert,
   FlatList,
+  Modal,
 } from 'react-native';
-
 import { useState } from 'react';
+import { useEffect } from 'react';
+import { buscarOnibusPorPlaca, listarOnibus } from '../../services/onibusService';
+
+import {
+  Ocorrencia,
+  registrarOcorrencia,
+  listarOcorrencias,
+  TipoOcorrencia,
+  Onibus,
+} from '../../services/ocorrenciaService';
 
 const tiposOcorrencia = [
-  'Pneu furado',
-  'Falha mecânica',
-  'Atraso',
-  'Desvio de rota',
-  'Superlotação',
-  'Emergência',
-];
+  { label: 'Falha Mecânica', value: 'FALHA_MECANICA' as TipoOcorrencia },
+  { label: 'Pneu Furado', value: 'PNEU_FURADO' as TipoOcorrencia },
+  { label: 'Acidente', value: 'ACIDENTE' as TipoOcorrencia },
+  { label: 'Trânsito', value: 'TRANSITO' as TipoOcorrencia },
+  { label: 'Outro', value: 'OUTRO' as TipoOcorrencia },
+]
 
 export default function RegistrarOcorrenciaScreen({ navigation }: any) {
-
   const [placa, setPlaca] = useState('');
-  const [tipoSelecionado, setTipoSelecionado] = useState('');
+  const [tipoSelecionado, setTipoSelecionado] = useState<TipoOcorrencia | ''>('');
   const [observacao, setObservacao] = useState('');
+  const [loading, setLoading] = useState(true);
 
-  function enviarOcorrencia() {
-    if (!placa || !tipoSelecionado) {
+  {/*Modal do ônibus*/}
+  const [idOnibus, setidOnibus] = useState('');
+  const [onibusNome, setOnibusNome] = useState('');
+  const [onibus, setOnibus] = useState<Onibus[]>([]);
+  const [modalOnibus, setModalOnibus] = useState(false);
+
+  useEffect(() => {
+    carregarOnibus();
+  }, []);
+
+  async function carregarOnibus() {
+    try {
+      const dados = await listarOnibus();
+      setOnibus(dados);
+    } catch (error) {
+      Alert.alert('Erro', 'Não foi possível carregar os ônibus:');
+    }
+  }
+
+  async function enviarOcorrencia() {
+    const onibus = await buscarOnibusPorPlaca(placa);
+
+    if (!idOnibus || !tipoSelecionado) {
       Alert.alert(
-        'Erro',
-        'Preencha a placa e selecione uma ocorrência.'
+        'Validação',
+        'Por favor, preencha a placa e selecione um tipo de ocorrência.'
       );
       return;
+    }
+
+    try {
+      await registrarOcorrencia(
+        idOnibus, 
+        tipoSelecionado, 
+        observacao
+      );
+
+      Alert.alert(
+        'Sucesso',
+        'Ocorrência registrada com sucesso.'
+      );
+    } catch (error) {
+      console.error(error);
+      Alert.alert(
+        'Erro',
+        'Não foi possível registrar a ocorrência.'
+      );
+    } finally {
+      setLoading(false);
     }
 
     navigation.navigate('MotoristaHome', {
@@ -50,18 +101,40 @@ export default function RegistrarOcorrenciaScreen({ navigation }: any) {
 
   return (
     <View style={styles.container}>
+    {/* MODAL SELEÇÃO ÔNIBUS */}
+      <Modal visible={modalOnibus} transparent animationType="slide">
+        <View style={styles.modalOverlay}>
+          <View style={styles.modalContainer}>
+            <Text style={styles.modalTitulo}>Selecione o Ônibus</Text>
+            {onibus.map((item) => (
+              <TouchableOpacity
+                key={item._id}
+                style={styles.paradaItem}
+                onPress={() => {
+                  setidOnibus(item._id);
+                  setOnibusNome(`${item.codigo} - ${item.placa}`);
+                  setModalOnibus(false);
+                }}
+              >
+                <Text>{item.codigo} - {item.placa}</Text>
+              </TouchableOpacity>
+            ))}
+          </View>
+        </View>
+      </Modal>
 
       <Text style={styles.title}>
         Registrar Ocorrência
       </Text>
 
-      <TextInput
+      <TouchableOpacity
         style={styles.input}
-        placeholder="Placa do ônibus"
-        placeholderTextColor="#94A3B8"
-        value={placa}
-        onChangeText={setPlaca}
-      />
+        onPress={() => setModalOnibus(true)}
+      >
+      <Text>
+        {onibusNome || 'Selecionar ônibus'}
+      </Text>
+      </TouchableOpacity>
 
       <Text style={styles.label}>
         Tipo de ocorrência
@@ -69,7 +142,7 @@ export default function RegistrarOcorrenciaScreen({ navigation }: any) {
 
       <FlatList
         data={tiposOcorrencia}
-        keyExtractor={(item) => item}
+        keyExtractor={(item) => item.value}
         numColumns={2}
         columnWrapperStyle={{
           justifyContent: 'space-between',
@@ -79,15 +152,13 @@ export default function RegistrarOcorrenciaScreen({ navigation }: any) {
             style={[
               styles.tipoButton,
 
-              tipoSelecionado === item &&
+              tipoSelecionado === item.value &&
                 styles.tipoSelecionado,
             ]}
-            onPress={() =>
-              setTipoSelecionado(item)
-            }
+            onPress={() => setTipoSelecionado(item.value)}
           >
             <Text style={styles.tipoText}>
-              {item}
+              {item.label}
             </Text>
           </TouchableOpacity>
         )}
@@ -187,5 +258,29 @@ const styles = StyleSheet.create({
     color: '#FFF',
     fontWeight: 'bold',
     fontSize: 16,
+  },
+  modalOverlay: { 
+    flex: 1, 
+    backgroundColor: 'rgba(0,0,0,0.5)', 
+    justifyContent: 'center', 
+    padding: 16 
+  },
+  modalContainer: { 
+    backgroundColor: '#FFF', 
+    borderRadius: 12, 
+    padding: 20 
+  },
+  modalTitulo: { 
+    fontSize: 20, 
+    fontWeight: 'bold', 
+    marginBottom: 16, 
+    color: '#1E40AF' 
+  },
+  paradaItem: { 
+    padding: 14, 
+    borderWidth: 1, 
+    borderColor: '#CBD5E1', 
+    borderRadius: 8, 
+    marginBottom: 10 
   },
 });
