@@ -39,7 +39,7 @@ export default function LoginScreen() {
   setCarregando(true);
 
   try {
-    const url = 'http://192.168.18.14:3000/auth/login';
+    const url = 'http://10.48.9.150:3000/auth/login';
     const corpoRequisicao = {
       usuario: login.usuario.trim().toLowerCase(),
       senha: login.senha,
