@@ -1,4 +1,4 @@
-import { IsNotEmpty, IsNumber, IsString, IsArray, Min,Max ,ValidateNested} from 'class-validator';
+import { IsNotEmpty, IsNumber, IsString, Min,Max } from 'class-validator';
 export class CreateParadaDto {
     @IsString({ message: "Nome é obrigatório" })
     @IsNotEmpty({ message: "Nome não pode ser vazio" })

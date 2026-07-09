@@ -1,4 +1,4 @@
-import { IsNumber, IsString, IsNotEmpty, IsDateString, IsMongoId } from 'class-validator';
+import { IsNumber, IsString, IsNotEmpty, IsMongoId } from 'class-validator';
 
 export class CreateLocalizacaoDto {
     @IsString({ message: "Onibus ID é obrigatório" })
