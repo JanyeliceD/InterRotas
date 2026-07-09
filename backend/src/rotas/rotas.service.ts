@@ -17,7 +17,7 @@ export class RotasService {
   async listarRotasComCalculoCombustivel() {
     const rotas = await this.rotaModel.find().exec();
     
-    // Busca o preço atualizado direto do banco através do outro service!
+    // Busca o preço atualizado direto do banco através do outro service
     const config = await this.configService.obterPrecoDiesel();
     const precoDiesel = config.precoDiesel;
     const mediaKmL = 3.5;
@@ -103,7 +103,7 @@ async atualizar(id: string, updateRotaDto: any) {
             updateRotaDto, 
             { returnDocument: 'after' }
         )
-        .exec(); // Sem populate, porque agora é string direto na rota!
+        .exec(); // Sem populate, porque agora é string direto na rota
 
     if (!rotaAtualizada) {
         throw new NotFoundException('Rota não encontrada');

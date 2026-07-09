@@ -12,16 +12,16 @@ export class Rota {
     nome!: string;
 
     @Prop({ 
-        type: String, // 👈 MUDADO DE ObjectId PARA String PURA
+        type: String,
         required: true 
     })
-    idMotorista!: string; // 👈 Agora armazena o nome do motorista em texto
+    idMotorista!: string;
 
     @Prop({ 
-        type: String, // 👈 MUDADO DE ObjectId PARA String PURA
+        type: String,
         required: true 
     })
-    idOnibus!: string; // 👈 Agora armazena a placa do ônibus em texto
+    idOnibus!: string; 
 
     @Prop({
         type: [{
@@ -32,7 +32,7 @@ export class Rota {
     })
     paradas!: mongoose.Types.ObjectId[];
 
-    @Prop({ type: Number, required: false, default: 0 }) // 👈 Define como número e começa em 0 se não enviado
+    @Prop({ type: Number, required: false, default: 0 }) // Define como número e começa em 0 se não enviado
     quilometragem?: number;
 }
 

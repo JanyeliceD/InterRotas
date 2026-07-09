@@ -1,12 +1,11 @@
 import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
-import { Usuario } from '../schemas/users.schema'; // Importe o Schema
+import { Usuario } from '../schemas/users.schema';
 
 @Injectable()
 export class usersService {
   constructor(
-    // Injeta o modelo do MongoDB aqui para podermos fazer buscas
     @InjectModel(Usuario.name) private usuarioModel: Model<Usuario>,
   ) {}
 
@@ -25,7 +24,7 @@ export class usersService {
     // 3. Se deu certo, envia o token e a role cadastrada (admin ou motorista)
     return {
       token: 'TOKEN_PROVISORIO_JWT',
-      role: conta.role, // O React Native vai ler isso para decidir a rota!
+      role: conta.role,
     };
   }
 }

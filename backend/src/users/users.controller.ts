@@ -11,7 +11,7 @@ export class usersController {
   @Post('login')
   @HttpCode(HttpStatus.OK)
   async entrar(@Body() loginDto: LoginDto) {
-    // Repassa os dados recebidos do React Native para o Service trabalhar
+    // Repassa os dados recebidos do React Native para o Service
     return this.usersService.validarUsuario(loginDto.usuario, loginDto.senha);
   }
 }

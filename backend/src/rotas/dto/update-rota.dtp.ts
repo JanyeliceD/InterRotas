@@ -1,4 +1,4 @@
-import { IsString, IsOptional, IsNumber } from 'class-validator'; // 👈 Adicione IsNumber aqui
+import { IsString, IsOptional, IsNumber } from 'class-validator'; 
 
 export class UpdateRotaDto {
   @IsString()
@@ -13,7 +13,7 @@ export class UpdateRotaDto {
   @IsOptional()
   onibus?: string;
 
-  @IsNumber() // 👈 Garante que o NestJS valide como número
+  @IsNumber()
   @IsOptional()
-  quilometragem?: number; // 👈 Adicionado aqui
+  quilometragem?: number;
 }

@@ -1,4 +1,4 @@
-import { IsString, IsNotEmpty, IsNumber, IsMongoId } from "class-validator"; 
+import { IsString, IsNotEmpty, IsNumber } from "class-validator"; 
 
 export class CreateOnibusDto {
     @IsString({ message: "Placa é obrigatória" })
@@ -12,9 +12,4 @@ export class CreateOnibusDto {
     @IsNumber({}, { message: "Capacidade deve ser um número" })
     @IsNotEmpty({ message: "Capacidade não pode ser vazio" })
     capacidade!: number;
-
-    // @IsString({ message: "ID da Rota é obrigatório" })
-    // @IsNotEmpty({ message: "ID da Rota não pode ser vazio" })
-    // @IsMongoId({ message: "ID da Rota deve ser um ID válido" })
-    // idRota!: string;
 }
