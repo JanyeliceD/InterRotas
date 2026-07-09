@@ -10,36 +10,32 @@ import {
 } from 'react-native';
 import { useState, useEffect } from 'react';
 import MapView from 'react-native-maps'; 
-import Mapa from '../../components/Mapa'; // Certifique-se de que o caminho está correto
+import Mapa from '../../components/Mapa'; 
 import { Localizacao } from '../../services/localizacaoService'; 
 import { listarLocalizacoes } from '../../services/localizacaoService';
 
-// 1. Importa a função do serviço que criamos e a interface de tipagem
-import { listarRotas, Rotas } from '../../services/rotaService'; // Ajuste o caminho da pasta se necessário
+import { listarRotas, Rotas } from '../../services/rotaService'; 
 
 export default function DashboardScreen() {
   const [busca, setBusca] = useState('');
   
-  // 2. Estados para armazenar as rotas vindas do BD e gerenciar o carregamento
   const [rotas, setRotas] = useState<Rotas[]>([]);
   const [carregando, setCarregando] = useState(true);
 
   const [todosOsOnibus, setTodosOsOnibus] = useState<Localizacao[]>([]);
 
-  // 3. Função que chama o serviço Axios
   const buscarRotasDoBackend = async () => {
   try {
     setCarregando(true);
     const dados = await listarRotas();
     
-    // Altere esta linha para garantir que seja sempre um Array:
     if (Array.isArray(dados)) {
       setRotas(dados);
     } else if (dados && typeof dados === 'object' && 'data' in dados && Array.isArray(dados.data)) {
-      // Caso o NestJS devolva algo como { data: [...] }
+      
       setRotas(dados.data);
     } else {
-      setRotas([]); // Evita que o app quebre se o banco vier vazio
+      setRotas([]); 
     }
 
   } catch (error) {
@@ -49,24 +45,22 @@ export default function DashboardScreen() {
     setCarregando(false);
   }
 };
-  // 4. Executa a busca automaticamente ao montar a tela
   useEffect(() => {
     buscarRotasDoBackend();
   }, []);
 
-  // O filtro agora varre a lista 'rotas' dinâmica preenchida pelo backend
-  const rotasFiltradas = rotas.filter((rota) =>  
+   const rotasFiltradas = rotas.filter((rota) =>  
     rota.nome?.toLowerCase().includes(busca.toLowerCase()) ||
     rota.idMotorista?.toLowerCase().includes(busca.toLowerCase())
   );
 
-  //MAPA
+ 
   useEffect(() => {
     carregarMapa();
 
     const intervalo = setInterval(() => {
       carregarMapa();
-    }, 10000); // Atualiza a cada 10 segundos
+    }, 10000); 
 
     return () => clearInterval(intervalo);
   }, []);
@@ -76,8 +70,7 @@ export default function DashboardScreen() {
     setTodosOsOnibus(dados);
 }
 
-  // Exibe tela de carregamento inicial enquanto o backend responde
-  if (carregando && rotas.length === 0) {
+   if (carregando && rotas.length === 0) {
     return (
       <View style={[styles.container, { justifyContent: 'center', alignItems: 'center' }]}>
         <ActivityIndicator size="large" color="#1E40AF" />
@@ -120,8 +113,7 @@ export default function DashboardScreen() {
           contentContainerStyle={styles.listContainer}
           showsVerticalScrollIndicator={false}
           
-          // Recurso Pull-to-Refresh: arrastar para baixo atualiza os dados
-          refreshing={carregando}
+           refreshing={carregando}
           onRefresh={buscarRotasDoBackend}
           
           renderItem={({ item }) => (
@@ -142,7 +134,6 @@ export default function DashboardScreen() {
                   <Text style={styles.boldText}>Odômetro: </Text>{item.quilometragem || 0} km
                 </Text>
 
-                {/* Validação baseada no dado numérico dinâmico */}
                 {(item.quilometragem || 0) >= 5000 && (
                   <View style={styles.manutencaoBadge}>
                     <Text style={styles.manutencaoText}>⚠️ REQUER TROCA DE ÓLEO</Text>

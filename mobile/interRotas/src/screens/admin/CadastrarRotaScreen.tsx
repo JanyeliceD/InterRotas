@@ -19,7 +19,7 @@ import { cadastrarRota } from '../../services/rotaService';
 
 export default function CadastrarRotaScreen({ navigation }: { navigation: any }) {
   const [nome, setNome] = useState('');
-  const [quilometragem, setQuilometragem] = useState(''); // 👈 Estado adicionado para a quilometragem
+  const [quilometragem, setQuilometragem] = useState(''); 
   const [motorista, setMotorista] = useState<Motorista[]>([]);
   const [onibus, setOnibus] = useState<Onibus[]>([]);
   const [paradas, setParadas] = useState<Parada[]>([]);
@@ -91,8 +91,7 @@ useEffect(() => {
 }
 
   async function cadastrar() {
-    // 👈 Atualizado para validar se a quilometragem foi digitada
-    if (!nome || !idMotorista || !idOnibus || !quilometragem || paradasSelecionadas.length === 0) {
+     if (!nome || !idMotorista || !idOnibus || !quilometragem || paradasSelecionadas.length === 0) {
       Alert.alert(
         'Erro',
         'Preencha todos os campos.'
@@ -101,12 +100,11 @@ useEffect(() => {
     }
 
     try {
-      // Modificado para passar os dados corretos que o seu backend agora espera
-      await cadastrarRota({
+        await cadastrarRota({
         nome,
-        onibus: onibusNome.split(' - ')[1],       // 👈 Envia a string da placa
-        motorista: motoristaNome.split(' - ')[1],   // 👈 Envia a string do nome do motorista
-        quilometragem: Number(quilometragem),       // 👈 Envia como Number puro para o banco
+        onibus: onibusNome.split(' - ')[1],      
+        motorista: motoristaNome.split(' - ')[1],   
+        quilometragem: Number(quilometragem),       
         paradas: paradasSelecionadas,
       });
 
@@ -116,7 +114,7 @@ useEffect(() => {
       );
 
         setNome('');
-        setQuilometragem(''); // 👈 Limpa o campo após o sucesso
+        setQuilometragem(''); 
         setidMotorista('');
         setMotoristaNome('');
         setidOnibus('');
@@ -132,7 +130,6 @@ useEffect(() => {
   return (
     <View style={styles.container}>
       
-      {/* MODAL SELEÇÃO MOTORISTA */}
       <Modal visible={modalMotorista} transparent animationType="slide">
         <View style={styles.modalOverlay}>
           <View style={styles.modalContainer}>
@@ -154,7 +151,7 @@ useEffect(() => {
         </View>
       </Modal>
 
-      {/* MODAL SELEÇÃO ÔNIBUS */}
+     
       <Modal visible={modalOnibus} transparent animationType="slide">
         <View style={styles.modalOverlay}>
           <View style={styles.modalContainer}>
@@ -176,7 +173,6 @@ useEffect(() => {
         </View>
       </Modal>
 
-      {/* MODAL SELEÇÃO PARADAS */}
       <Modal visible={modalVisible} animationType="slide" transparent>
         <View style={styles.modalOverlay}>
           <View style={styles.modalContainer}>
@@ -213,12 +209,11 @@ useEffect(() => {
         onChangeText={setNome}
       />
 
-      {/* 👈 INPUT DE QUILOMETRAGEM ADICIONADO AQUI */}
       <TextInput
         style={styles.input}
         placeholder="Quilometragem da rota (km)"
         placeholderTextColor="#64748B"
-        keyboardType="numeric" // Garante teclado numérico no celular
+        keyboardType="numeric" 
         value={quilometragem}
         onChangeText={setQuilometragem}
       />
@@ -250,7 +245,6 @@ useEffect(() => {
   );
 }
 
-// Mantenha os seus styles exatamente iguais abaixo
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#F8FAFC', padding: 16 },
   titulo: { color: '#1E40AF', fontSize: 24, fontWeight: 'bold', marginBottom: 24 },

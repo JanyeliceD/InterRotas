@@ -1,42 +1,34 @@
 import { View, Text, StyleSheet, TextInput, FlatList, Pressable, Modal, ActivityIndicator, Alert } from 'react-native';
 import { useState, useEffect } from 'react';
 
-// IMPORTAÇÃO DOS SEUS SERVIÇOS E TIPOS
+
 import { listarRotas, atualizarRota, deletarRota, Rotas } from '../../services/rotaService'; 
 import { listarMotoristas, Motorista } from '../../services/motoristaService';
 import { listarOnibus, Onibus } from '../../services/onibusService';
 import Mapa from '../../components/Mapa';
-import { Localizacao } from '../../services/localizacaoService';
-import { listarLocalizacoes } from '../../services/localizacaoService';
+import { Localizacao, listarLocalizacoes } from '../../services/localizacaoService';
 
 export default function MonitoramentoScreen() {
   const [busca, setBusca] = useState('');
   const [listaRotas, setListaRotas] = useState<Rotas[]>([]);
   const [carregando, setCarregando] = useState(true);
-
-  // LISTAS AUXILIARES VINDAS DO BANCO DE DADOS
   const [todosOnibus, setTodosOnibus] = useState<Onibus[]>([]);
   const [todosMotoristas, setTodosMotoristas] = useState<Motorista[]>([]);
-
-  // ESTADOS DO MODAL DE DETALHES (RELATÓRIO)
   const [modalDetalhesVisivel, setModalDetalhesVisivel] = useState(false);
   const [rotaSelecionada, setRotaSelecionada] = useState<Rotas | null>(null);
-
-  // ESTADOS DO MODAL DE EDIÇÃO
   const [modalEditarVisivel, setModalEditarVisivel] = useState(false);
   const [idEditando, setIdEditando] = useState('');
   const [nomeEditando, setNomeEditando] = useState('');
   const [idOnibusSelecionado, setIdOnibusSelecionado] = useState('');
   const [idMotoristaSelecionado, setIdMotoristaSelecionado] = useState('');
-
-  // ESTADOS DOS SUB-MODAIS DE SELEÇÃO (PICKERS)
   const [modalSeletorOnibusVisivel, setModalSeletorOnibusVisivel] = useState(false);
   const [modalSeletorMotoristaVisivel, setModalSeletorMotoristaVisivel] = useState(false);
+
+  const [localizacoes, setLocalizacoes] = useState<Localizacao[]>([]);
 
   const precoDiesel = 5.90; 
   const mediaKmL = 3.5;
 
-  // Busca todos os dados necessários do backend simultaneamente
   const carregarDadosIniciais = async () => {
     try {
       setCarregando(true);
@@ -61,14 +53,31 @@ export default function MonitoramentoScreen() {
     carregarDadosIniciais();
   }, []);
 
-  // Mapeia dinamicamente o objeto para exibição do texto no seletor com base no ID
-  const onibusAtual = todosOnibus.find(o => (o._id || o.id) === idOnibusSelecionado);
-  const motoristaAtual = todosMotoristas.find(m => (m._id || m.id) === idMotoristaSelecionado);
+  useEffect(() => {
+    carregarMapa();
 
-  // Filtro de busca inteligente e à prova de quebras por tipos de dados híbridos
+    const intervalo = setInterval(() => {
+      carregarMapa();
+    }, 10000); 
+
+    return () => clearInterval(intervalo);
+  }, []);
+
+  async function carregarMapa() {
+    try {
+      const dados = await listarLocalizacoes();
+      setLocalizacoes(dados);
+    } catch (err) {
+      console.log("Erro ao carregar mapa", err);
+    }
+  }
+
+   const onibusAtual = todosOnibus.find(o => (o._id || o.id) === idOnibusSelecionado || o.placa === idOnibusSelecionado);
+  const motoristaAtual = todosMotoristas.find(m => (m._id || m.id) === idMotoristaSelecionado || m.nome === idMotoristaSelecionado);
+
+
   const rotasFiltradas = listaRotas.filter((rota) => {
     const nomeRota = rota.nome?.toLowerCase() || '';
-    
     const nomeMotorista = typeof rota.idMotorista === 'object' 
       ? (rota.idMotorista?.nome || '').toLowerCase() 
       : (rota.idMotorista || rota.motorista || '').toLowerCase();
@@ -82,131 +91,163 @@ export default function MonitoramentoScreen() {
   }
 
   function iniciarEdicao(item: Rotas) {
+    console.log('🏁 RASTREIO [Passo 1.1] - Iniciando edição da rota. Dados brutos recebidos do card:', item);
+    
     setIdEditando(item._id?.toString() || item.id?.toString() || '');
     setNomeEditando(item.nome || '');
     
-    setIdOnibusSelecionado(item.idOnibus?._id || item.idOnibus || '');
-    setIdMotoristaSelecionado(item.idMotorista?._id || item.idMotorista || '');
+    const textoOnibus = typeof item.idOnibus === 'object' ? item.idOnibus?.placa : item.idOnibus;
+    const textoMotorista = typeof item.idMotorista === 'object' ? item.idMotorista?.nome : item.idMotorista;
+    
+    console.log(` RASTREIO [Passo 1.2] - Textos extraídos para busca -> Ônibus/Placa: "${textoOnibus}", Motorista: "${textoMotorista}"`);
+    console.log(` RASTREIO [Passo 1.3] - Listas disponíveis para comparação -> Total Ônibus: ${todosOnibus.length}, Total Motoristas: ${todosMotoristas.length}`);
+
+    const onibusEncontrado = todosOnibus.find(o => o.placa?.trim().toLowerCase() === textoOnibus?.trim().toLowerCase());
+    const motoristaEncontrado = todosMotoristas.find(m => m.nome?.trim().toLowerCase() === textoMotorista?.trim().toLowerCase());
+
+    console.log(' RASTREIO [Passo 1.4] - Resultado da busca interna -> Ônibus Objeto:', onibusEncontrado, ' | Motorista Objeto:', motoristaEncontrado);
+
+    const idOnibusDefinido = onibusEncontrado?._id || onibusEncontrado?.id || textoOnibus || '';
+    const idMotoristaDefinido = motoristaEncontrado?._id || motoristaEncontrado?.id || textoMotorista || '';
+
+    setIdOnibusSelecionado(idOnibusDefinido);
+    setIdMotoristaSelecionado(idMotoristaDefinido);
+    
+    console.log(` RASTREIO [Passo 1.5] - Estados locais definidos -> idOnibusSelecionado: "${idOnibusDefinido}", idMotoristaSelecionado: "${idMotoristaDefinido}"`);
     
     setModalEditarVisivel(true);
+    console.log(' RASTREIO [Passo 1.6] - Comando setModalEditarVisivel(true) disparado.');
   }
 
-  const [localizacoes, setLocalizacoes] = useState<Localizacao[]>([]);
-
-    //MAPA
-    useEffect(() => {
-      carregarMapa();
-  
-      const intervalo = setInterval(() => {
-        carregarMapa();
-      }, 10000); // Atualiza a cada 10 segundos
-  
-      return () => clearInterval(intervalo);
-    }, []);
-  
-    async function carregarMapa() {
-      const dados = await listarLocalizacoes();
-      setLocalizacoes(dados);
-  }
-
-async function lidarComDeletar(id: string) {
-    console.log('====== INICIANDO PROCESSO DE EXCLUSÃO ======');
-    console.log('ID enviado para o Service:', id);
-
-    if (!id) {
-      console.log('🛑 Erro: ID não foi fornecido.');
-      return;
-    }
-
-    try {
-      setCarregando(true);
-      
-      // Chama o backend direto para testar a rota
-      const resposta = await deletarRota(id); 
-      console.log('🟢 RESPOSTA DO SERVIDOR COM SUCESSO:', resposta);
-
-      // Atualiza o estado na tela
-      setListaRotas((rotasAtuais) => 
-        rotasAtuais.filter(rota => {
-          const rId = rota._id?.toString() || rota.id?.toString();
-          return rId !== id;
-        })
-      );
-      
-      Alert.alert("Sucesso", "Rota excluída com sucesso!");
-    } catch (error: any) {
-      console.log('🛑 ERRO DETECTADO NA REQUISIÇÃO:');
-      
-      if (error.response) {
-        console.log('Status do erro do Backend:', error.response.status);
-        console.log('Corpo do erro do Backend:', error.response.data);
-      } else if (error.request) {
-        console.log('A requisição foi feita mas não houve resposta do servidor (Sem conexão).');
-      } else {
-        console.log('Erro de configuração do Axios:', error.message);
-      }
-    } finally {
-      setCarregando(false);
-      await carregarDadosIniciais();
-    }
-  }
   async function salvarAlteracoesBackend() {
-    const nomeDoMotoristaEscolhido = todosMotoristas.find(m => (m._id || m.id) === idMotoristaSelecionado)?.nome || '';
-    const placaDoOnibusEscolhido = todosOnibus.find(o => (o._id || o.id) === idOnibusSelecionado)?.placa || '';
+    console.log(' RASTREIO [Passo 2.1] - Botão "Salvar" foi clicado na interface.');
+    console.log(` RASTREIO [Passo 2.2] - Estados atuais antes de processar -> idOnibusSelecionado: "${idOnibusSelecionado}", idMotoristaSelecionado: "${idMotoristaSelecionado}"`);
+
+    const onibusObjeto = todosOnibus.find(o => (o._id || o.id) === idOnibusSelecionado);
+    const motoristaObjeto = todosMotoristas.find(m => (m._id || m.id) === idMotoristaSelecionado);
+
+    const placaDoOnibusEscolhido = onibusObjeto ? onibusObjeto.placa : idOnibusSelecionado;
+    const nomeDoMotoristaEscolhido = motoristaObjeto ? motoristaObjeto.nome : idMotoristaSelecionado;
+
+    console.log(` RASTREIO [Passo 2.3] - Strings finais resolvidas para envio -> Placa: "${placaDoOnibusEscolhido}", Motorista: "${nomeDoMotoristaEscolhido}"`);
 
     if (!nomeEditando || !placaDoOnibusEscolhido || !nomeDoMotoristaEscolhido) {
+      console.log(' RASTREIO [Passo 2.4 - FALHA] - Validação falhou! Campos obrigatórios vazios:', {
+        nomeEditando,
+        placaDoOnibusEscolhido,
+        nomeDoMotoristaEscolhido
+      });
       Alert.alert('Erro', 'Por favor, selecione o ônibus e o motorista.');
       return;
     }
 
+    console.log(' RASTREIO [Passo 2.5 - SUCESSO] - Validação passou. Preparando chamada HTTP Axios...');
+
     try {
       setCarregando(true);
-
-      // Envia as strings brutas para o backend salvar diretamente na rota
-      await atualizarRota(idEditando, {
+      
+      const payloadEnvio = {
         nome: nomeEditando,
         idOnibus: placaDoOnibusEscolhido,     
         idMotorista: nomeDoMotoristaEscolhido  
-      });
+      };
+      
+      console.log(` RASTREIO [Passo 2.6] - Enviando PUT/PATCH para ID Rota: "${idEditando}". Payload:`, payloadEnvio);
+
+
+      const respostaServidor = await atualizarRota(idEditando, payloadEnvio);
+      
+      console.log(' RASTREIO [Passo 2.7] - Resposta de sucesso retornada pela API:', respostaServidor);
 
       Alert.alert('Sucesso', 'Rota atualizada com sucesso!');
+      
       setModalEditarVisivel(false);
+      console.log(' RASTREIO [Passo 2.8] - Modal de edição fechado.');
+      
+      console.log(' RASTREIO [Passo 2.9] - Recarregando dados iniciais da tela...');
       await carregarDadosIniciais();
-    } catch (error) {
-      Alert.alert('Erro', 'Não foi possível salvar.');
+      console.log(' RASTREIO [Passo 2.10] - Fluxo completo finalizado.');
+      
+    } catch (error: any) {
+      console.log(' RASTREIO [Passo 2.E - ERRO CRÍTICO NO BACKEND] ->', error);
+      if (error.response) {
+        console.log(' RASTREIO - Dados de erro do Axios:', error.response.data);
+      }
+      Alert.alert('Erro', 'Não foi possível salvar as alterações.');
     } finally {
       setCarregando(false);
     }
   }
 
+ 
+  async function lidarComDeletar(id: string) {
+    if (!id) {
+      Alert.alert('Erro', 'ID da rota inválido.');
+      return;
+    }
+
+    Alert.alert(
+      "Confirmar Exclusão",
+      "Tem certeza que deseja deletar esta rota permanentemente?",
+      [
+        { text: "Cancelar", style: "cancel" },
+        { 
+          text: "Excluir", 
+          style: "destructive", 
+          onPress: async () => {
+            try {
+              setCarregando(true);
+              await deletarRota(id); 
+
+              setListaRotas((rotasAtuais) => 
+                rotasAtuais.filter(rota => {
+                  const rId = rota._id?.toString() || rota.id?.toString();
+                  return rId !== id;
+                })
+              );
+              
+              Alert.alert("Sucesso", "Rota excluída com sucesso!");
+            } catch (error) {
+              Alert.alert('Erro', 'Não foi possível deletar a rota do servidor.');
+            } finally {
+              setCarregando(false);
+            }
+          }
+        }
+      ]
+    );
+  }
+
+  
+    
+  
+
   return (
     <View style={styles.container}>
       
-      {/* 1. MODAL DE VISUALIZAR DETALHES (RELATÓRIO) */}
       <Modal animationType="fade" transparent={true} visible={modalDetalhesVisivel} onRequestClose={() => setModalDetalhesVisivel(false)}>
         <View style={styles.modalOverlay}>
           <View style={styles.modalContent}>
             <Text style={styles.modalTitle}>Relatório da Rota</Text>
             {rotaSelecionada && (
               <View style={styles.modalBody}>
-                {/* MAPA */}
                 <View style={styles.mapContainer}>
                   <Mapa 
-                  localizacoes={localizacoes}
-                  paradas={rotaSelecionada.paradas || []}
-                  mostrarOnibus={true}
-                  mostrarParadas={true}
-                  mostrarRota={true}
+                    localizacoes={localizacoes}
+                    paradas={rotaSelecionada.paradas || []}
+                    mostrarOnibus={true}
+                    mostrarParadas={true}
+                    mostrarRota={true}
                   />
                 </View>
                 <Text style={styles.modalTextoLinha}><Text style={styles.boldText}>Linha: </Text>{rotaSelecionada.nome}</Text>
                 <Text style={styles.modalTexto}>
-                  <Text style={styles.boldText}>Veículo/Placa: BUS002</Text>
-
+                  <Text style={styles.boldText}>Veículo/Placa: </Text>
+                  {typeof rotaSelecionada.idOnibus === 'object' ? rotaSelecionada.idOnibus?.placa : (rotaSelecionada.idOnibus || 'Não informado')}
                 </Text>
                 <Text style={styles.modalTexto}>
                   <Text style={styles.boldText}>Motorista: </Text>
-                  {typeof rotaSelecionada.idMotorista === 'object' ? rotaSelecionada.idMotorista?.nome : (rotaSelecionada.idMotorista || rotaSelecionada.motorista || 'Não informado')}
+                  {typeof rotaSelecionada.idMotorista === 'object' ? rotaSelecionada.idMotorista?.nome : (rotaSelecionada.idMotorista || 'Não informado')}
                 </Text>
                 <View style={styles.divisor} />
                 <Text style={styles.modalTexto}><Text style={styles.boldText}>Odômetro: </Text>{rotaSelecionada.quilometragem || 0} km</Text>
@@ -221,7 +262,6 @@ async function lidarComDeletar(id: string) {
         </View>
       </Modal>
 
-      {/* 2. MODAL DE EDIÇÃO PRINCIPAL */}
       <Modal animationType="slide" transparent={true} visible={modalEditarVisivel} onRequestClose={() => setModalEditarVisivel(false)}>
         <View style={styles.modalOverlay}>
           <View style={styles.modalContent}>
@@ -230,20 +270,18 @@ async function lidarComDeletar(id: string) {
             <Text style={styles.inputLabel}>Nome da Linha</Text>
             <TextInput style={styles.modalInput} value={nomeEditando} onChangeText={setNomeEditando} />
 
-            {/* SELETOR DE ÔNIBUS */}
             <Text style={styles.inputLabel}>Selecionar Ônibus (Placa)</Text>
             <Pressable style={styles.seletorBotao} onPress={() => setModalSeletorOnibusVisivel(true)}>
               <Text style={styles.seletorBotaoTexto}>
-                {onibusAtual ? `${onibusAtual.placa} (${onibusAtual.modelo || ''})` : 'Escolha um veículo...'}
+                {onibusAtual ? `${onibusAtual.placa} ${onibusAtual.modelo ? `(${onibusAtual.modelo})` : ''}` : (idOnibusSelecionado || 'Escolha um veículo...')}
               </Text>
               <Text style={styles.setaSeletor}>▼</Text>
             </Pressable>
 
-            {/* SELETOR DE MOTORISTA */}
             <Text style={styles.inputLabel}>Selecionar Motorista</Text>
             <Pressable style={styles.seletorBotao} onPress={() => setModalSeletorMotoristaVisivel(true)}>
               <Text style={styles.seletorBotaoTexto}>
-                {motoristaAtual ? motoristaAtual.nome : 'Escolha um motorista...'}
+                {motoristaAtual ? motoristaAtual.nome : (idMotoristaSelecionado || 'Escolha um motorista...')}
               </Text>
               <Text style={styles.setaSeletor}>▼</Text>
             </Pressable>
@@ -260,8 +298,7 @@ async function lidarComDeletar(id: string) {
         </View>
       </Modal>
 
-      {/* SUB-MODAL: SELEÇÃO DE ÔNIBUS */}
-      <Modal animationType="fade" transparent={true} visible={modalSeletorOnibusVisivel}>
+      <Modal animationType="fade" transparent={true} visible={modalSeletorOnibusVisivel} onRequestClose={() => setModalSeletorOnibusVisivel(false)}>
         <View style={styles.subModalOverlay}>
           <View style={styles.subModalContent}>
             <Text style={styles.subModalTitle}>Selecione o Veículo</Text>
@@ -281,8 +318,7 @@ async function lidarComDeletar(id: string) {
         </View>
       </Modal>
 
-      {/* SUB-MODAL: SELEÇÃO DE MOTORISTAS */}
-      <Modal animationType="fade" transparent={true} visible={modalSeletorMotoristaVisivel}>
+      <Modal animationType="fade" transparent={true} visible={modalSeletorMotoristaVisivel} onRequestClose={() => setModalSeletorMotoristaVisivel(false)}>
         <View style={styles.subModalOverlay}>
           <View style={styles.subModalContent}>
             <Text style={styles.subModalTitle}>Selecione o Motorista</Text>
@@ -302,7 +338,6 @@ async function lidarComDeletar(id: string) {
         </View>
       </Modal>
 
-      {/* LISTA PRINCIPAL DE MONITORAMENTO */}
       <View style={styles.searchContainer}>
         <Text style={styles.mainTitle}>Monitoramento de Frota</Text>
         <TextInput style={styles.searchInput} placeholder="Buscar rota ou motorista..." placeholderTextColor="#94A3B8" value={busca} onChangeText={setBusca} />
@@ -342,17 +377,9 @@ async function lidarComDeletar(id: string) {
               <View style={styles.direitaCard}>
                 <Pressable style={styles.botaoAcao} onPress={() => verDetalhes(item)}><Text style={styles.textoBotaoAcao}>Detalhes</Text></Pressable>
                 <Pressable style={styles.botaoEditar} onPress={() => iniciarEdicao(item)}><Text style={styles.textoBotaoEditar}>Editar</Text></Pressable>
-<Pressable 
-  style={[styles.botaoAcao, styles.botaoDeletar]} 
-  onPress={() => {
-    // Garante extrair o ID correto independente de vir do MongoDB (_id) ou mapeado (id)
-    const idRota = item._id?.toString() || item.id?.toString() || '';
-    lidarComDeletar(idRota);
-  }}
->
-  <Text style={styles.textoBotaoDeletar}>Excluir</Text>
-</Pressable>
-
+                <Pressable style={[styles.botaoAcao, styles.botaoDeletar]} onPress={() => lidarComDeletar(item._id?.toString() || item.id?.toString() || '')}>
+                  <Text style={styles.textoBotaoDeletar}>Excluir</Text>
+                </Pressable>
               </View>
             </View>
           )}
@@ -383,7 +410,6 @@ const styles = StyleSheet.create({
   textoBotaoEditar: { color: '#334155', fontSize: 12, fontWeight: '600' },
   botaoDeletar: { backgroundColor: '#FEF2F2', borderWidth: 1, borderColor: '#FCA5A5' },
   textoBotaoDeletar: { color: '#991B1B', fontSize: 12, fontWeight: '600' },
-  
   modalOverlay: { flex: 1, backgroundColor: 'rgba(0, 0, 0, 0.5)', justifyContent: 'center', alignItems: 'center', padding: 20 },
   modalContent: { backgroundColor: '#FFFFFF', borderRadius: 16, padding: 20, width: '100%', maxWidth: 400 },
   modalTitle: { fontSize: 18, fontWeight: '700', color: '#1E40AF', marginBottom: 16, textAlign: 'center' },
@@ -396,21 +422,14 @@ const styles = StyleSheet.create({
   textoBotaoFechar: { color: '#FFFFFF', fontSize: 14, fontWeight: '600' },
   inputLabel: { fontSize: 12, fontWeight: '600', color: '#475569', marginBottom: 4, marginTop: 10 },
   modalInput: { backgroundColor: '#F8FAFC', borderWidth: 1, borderColor: '#CBD5E1', borderRadius: 6, paddingHorizontal: 12, paddingVertical: 8, color: '#1E293B', fontSize: 14 },
-  
   seletorBotao: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', backgroundColor: '#F8FAFC', borderWidth: 1, borderColor: '#CBD5E1', borderRadius: 6, paddingHorizontal: 12, paddingVertical: 10 },
   seletorBotaoTexto: { color: '#1E293B', fontSize: 14 },
   setaSeletor: { color: '#64748B', fontSize: 10 },
-  
   subModalOverlay: { flex: 1, backgroundColor: 'rgba(0, 0, 0, 0.4)', justifyContent: 'flex-end' },
   subModalContent: { backgroundColor: '#FFFFFF', borderTopLeftRadius: 20, borderTopRightRadius: 20, padding: 20, maxHeight: '60%' },
   subModalTitle: { fontSize: 16, fontWeight: '700', color: '#1E293B', marginBottom: 14, textAlign: 'center' },
   itemSelecao: { paddingVertical: 14, borderBottomWidth: 1, borderColor: '#F1F5F9' },
   itemSelecaoTexto: { fontSize: 15, color: '#334155' },
   botaoCancelarSeletor: { backgroundColor: '#64748B', paddingVertical: 12, borderRadius: 8, alignItems: 'center', marginTop: 10 },
-  mapContainer: {
-    height: 300,
-    borderRadius: 12,
-    overflow: 'hidden',
-    marginBottom: 12,
-  },
+  mapContainer: { height: 300, borderRadius: 12, overflow: 'hidden', marginBottom: 12 },
 });

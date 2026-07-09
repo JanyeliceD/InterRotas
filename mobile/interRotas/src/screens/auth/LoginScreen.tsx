@@ -5,7 +5,7 @@ import { RootStackParamList } from '../../navigation/RootNavigator';
 import { Pressable, Text, View, TextInput, Alert, ActivityIndicator } from 'react-native';
 import { styles } from './styles';
 import { useState } from 'react';
-// import * as SecureStore from 'expo-secure-store'; // Se usar Expo
+
 
 type DadosLogin = {
     usuario: string;
@@ -28,7 +28,7 @@ export default function LoginScreen() {
 
   const [login, setLogin] = useState<DadosLogin>({ usuario: '', senha: '' });
   const [erros, setErros] = useState<LoginErrors>({});
-  const [carregando, setCarregando] = useState<boolean>(false); // Proteção contra duplo clique
+  const [carregando, setCarregando] = useState<boolean>(false); 
 
   async function entrar() {
   const errosEncontrados = validarLogin(login);
@@ -39,7 +39,7 @@ export default function LoginScreen() {
   setCarregando(true);
 
   try {
-    const url = 'http://10.48.9.150:3000/auth/login';
+    const url = 'http://192.168.18.14:3000/auth/login';
     const corpoRequisicao = {
       usuario: login.usuario.trim().toLowerCase(),
       senha: login.senha,
@@ -58,9 +58,7 @@ export default function LoginScreen() {
     if (!resposta.ok) {
       throw new Error(dados.message || 'Credenciais inválidas.');
     }
-
-    // Navegação baseada no tipo de usuário retornado pelo MongoDB
-    if (dados.role === 'admin') {
+  if (dados.role === 'admin') {
        navigation.navigate('AppDrawer'); 
     } else if (dados.role === 'motorista') {
        navigation.navigate('MotoristaHome'); 
@@ -87,7 +85,7 @@ export default function LoginScreen() {
           onChangeText={(texto) => setLogin({...login, usuario: texto})}
           style={styles.input}
           autoCapitalize="none"
-          editable={!carregando} // Desabilita enquanto carrega
+          editable={!carregando} 
         />
         {erros.usuario && <Text style={{ color: 'red', marginBottom: 8, marginLeft: 4 }}>{erros.usuario}</Text>}
 
@@ -98,7 +96,7 @@ export default function LoginScreen() {
           onChangeText={(texto) => setLogin({...login, senha: texto})}
           secureTextEntry
           style={styles.input}
-          editable={!carregando} // Desabilita enquanto carrega
+          editable={!carregando} 
         />
         {erros.senha && <Text style={{ color: 'red', marginBottom: 8, marginLeft: 4 }}>{erros.senha}</Text>}  
 

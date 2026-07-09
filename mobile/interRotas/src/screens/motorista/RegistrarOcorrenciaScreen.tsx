@@ -34,7 +34,7 @@ export default function RegistrarOcorrenciaScreen({ navigation }: any) {
   const [observacao, setObservacao] = useState('');
   const [loading, setLoading] = useState(true);
 
-  {/*Modal do ônibus*/}
+  
   const [idOnibus, setidOnibus] = useState('');
   const [onibusNome, setOnibusNome] = useState('');
   const [onibus, setOnibus] = useState<Onibus[]>([]);
@@ -101,8 +101,7 @@ export default function RegistrarOcorrenciaScreen({ navigation }: any) {
 
   return (
     <View style={styles.container}>
-    {/* MODAL SELEÇÃO ÔNIBUS */}
-      <Modal visible={modalOnibus} transparent animationType="slide">
+       <Modal visible={modalOnibus} transparent animationType="slide">
         <View style={styles.modalOverlay}>
           <View style={styles.modalContainer}>
             <Text style={styles.modalTitulo}>Selecione o Ônibus</Text>
