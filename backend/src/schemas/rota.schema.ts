@@ -33,7 +33,7 @@ export class Rota {
     paradas!: mongoose.Types.ObjectId[];
 
     @Prop({ type: Number, required: false, default: 0 }) // Define como número e começa em 0 se não enviado
-    quilometragem?: number;
+    quilometragem!: number;
 }
 
 export const RotaSchema = SchemaFactory.createForClass(Rota);
