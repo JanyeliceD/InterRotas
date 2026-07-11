@@ -7,8 +7,7 @@ import {
   Alert,
   Modal,
 } from 'react-native';
-import { useState } from 'react';
-import { useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { Motorista } from '../../types/motorista';
 import { Onibus } from '../../types/onibus';
 import { listarMotoristas } from '../../services/motoristaService';
@@ -25,111 +24,85 @@ export default function CadastrarRotaScreen({ navigation }: { navigation: any })
   const [paradas, setParadas] = useState<Parada[]>([]);
 
   const [idMotorista, setidMotorista] = useState('');
-  const [motoristaNome, setMotoristaNome] = useState('');
+  const [idOnibus, setidOnibus] = useState('');           
+  const [motoristaNome, setMotoristaNome] = useState(''); 
+  const [onibusPlaca, setOnibusPlaca] = useState('');     
+  const [codigoRota, setCodigoRota] = useState('');
+  const [modalMotorista, setModalMotorista] = useState(false);
+  const [modalOnibus, setModalOnibus] = useState(false);
+  const [modalVisible, setModalVisible] = useState(false);
+  const [paradasSelecionadas, setParadasSelecionadas] = useState<string[]>([]);
 
-  const [idOnibus, setidOnibus] = useState('');
-  const [onibusNome, setOnibusNome] = useState('');
+  useEffect(() => {
+    async function carregarDados() {
+      try {
+        const motoristasApi = await listarMotoristas();
+        const onibusApi = await listarOnibus();
+        const paradasApi = await listarParadas();
 
-  const [paradaId, setParadaId] = useState('');
-  const [paradaNome, setParadaNome] = useState('');
+        setMotorista(motoristasApi);
+        setOnibus(onibusApi);
+        setParadas(paradasApi);
+      } catch (error: any) {
+        console.log('Erro ao carregar dados iniciais:', error.response?.data || error.message);
+        Alert.alert('Erro', 'Não foi possível carregar os dados.');
+      }
+    }
+    carregarDados();
+  }, []);
 
-  const [modalMotorista, setModalMotorista] =
-    useState(false);
-
-  const [modalOnibus, setModalOnibus] =
-    useState(false);
-
-useEffect(() => {
-  async function carregarDados() {
-    try {
-      const motoristasApi = await listarMotoristas();
-      console.log('Motoristas:', motoristasApi);
-
-      const onibusApi = await listarOnibus();
-      console.log('Ônibus:', onibusApi);
-
-      const paradasApi = await listarParadas();
-      console.log('Paradas:', paradasApi);
-
-      setMotorista(motoristasApi);
-      setOnibus(onibusApi);
-      setParadas(paradasApi);
-
-    } catch (error: any) {
-      console.log('URL:', error.config?.url);
-      console.log('Status:', error.response?.status);
-      console.log('Data:', error.response?.data);
-
-      Alert.alert(
-        'Erro',
-        'Não foi possível carregar os dados.'
-      );
+  function toggleParada(paradaId: string) {
+    if (paradasSelecionadas.includes(paradaId)) {
+      setParadasSelecionadas(paradasSelecionadas.filter((item) => item !== paradaId));
+    } else {
+      setParadasSelecionadas([...paradasSelecionadas, paradaId]);
     }
   }
 
-  carregarDados();
-}, []);
-
-  const [modalVisible, setModalVisible] = useState(false);
-
-  const [paradasSelecionadas, setParadasSelecionadas] =
-    useState<string[]>([]);
-
-  function toggleParada(parada: string) {
-  if (paradasSelecionadas.includes(parada)) {
-    setParadasSelecionadas(
-      paradasSelecionadas.filter(
-        (item) => item !== parada
-      )
-    );
-  } else {
-    setParadasSelecionadas([
-      ...paradasSelecionadas,
-      parada,
-    ]);
-  }
-}
-
   async function cadastrar() {
-     if (!nome || !idMotorista || !idOnibus || !quilometragem || paradasSelecionadas.length === 0) {
-      Alert.alert(
-        'Erro',
-        'Preencha todos os campos.'
-      );
+    if (!codigoRota || !nome || !motoristaNome || !onibusPlaca || !quilometragem || paradasSelecionadas.length === 0) {
+      Alert.alert('Erro', 'Por favor, preencha todos os campos.');
       return;
     }
 
     try {
-        await cadastrarRota({
-        nome,
-        onibus: onibusNome.split(' - ')[1],      
-        motorista: motoristaNome.split(' - ')[1],   
-        quilometragem: Number(quilometragem),       
-        paradas: paradasSelecionadas,
-      });
+       const payload = {
+        codigo: codigoRota,              
+        nome: nome,                       
+        idOnibus: onibusPlaca,           
+        idMotorista: motoristaNome,        
+        motorista: motoristaNome,          
+        quilometragem: Number(quilometragem), 
+        paradas: paradasSelecionadas,     
+      };
 
-        Alert.alert(
-        'Sucesso',
-        'Rota cadastrada.'
-      );
+      console.log('Enviando formato exato:', payload);
 
-        setNome('');
-        setQuilometragem(''); 
-        setidMotorista('');
-        setMotoristaNome('');
-        setidOnibus('');
-        setOnibusNome('');
-        setParadasSelecionadas([]);
+      await cadastrarRota(payload);
+
+      Alert.alert('Sucesso', 'Rota cadastrada com sucesso!');
+
+   
+      setCodigoRota('');
+      setNome('');
+      setQuilometragem(''); 
+      setidMotorista('');
+      setMotoristaNome('');
+      setidOnibus('');
+      setOnibusPlaca('');
+      setParadasSelecionadas([]);
     } catch (error: any) {
-      console.log('Status:', error.response?.status);
-      console.log('Data:', error.response?.data);
-      console.error('Erro ao cadastrar rota:', error);
+      console.log('Status Erro:', error.response?.status);
+      console.log('O que o NestJS barrou:', JSON.stringify(error.response?.data?.message));
+      Alert.alert('Erro', 'O backend recusou os dados. Verifique as validações do DTO.');
     }
+  
   }
 
   return (
     <View style={styles.container}>
       
+      {/* MODAL SELEÇÃO MOTORISTA */}
       <Modal visible={modalMotorista} transparent animationType="slide">
         <View style={styles.modalOverlay}>
           <View style={styles.modalContainer}>
@@ -140,7 +113,7 @@ useEffect(() => {
                 style={styles.paradaItem}
                 onPress={() => {
                   setidMotorista(item._id);
-                  setMotoristaNome(`${item.matricula} - ${item.nome}`);
+                  setMotoristaNome(item.nome); 
                   setModalMotorista(false);
                 }}
               >
@@ -151,7 +124,7 @@ useEffect(() => {
         </View>
       </Modal>
 
-     
+      {/* MODAL SELEÇÃO ÔNIBUS */}
       <Modal visible={modalOnibus} transparent animationType="slide">
         <View style={styles.modalOverlay}>
           <View style={styles.modalContainer}>
@@ -162,7 +135,7 @@ useEffect(() => {
                 style={styles.paradaItem}
                 onPress={() => {
                   setidOnibus(item._id);
-                  setOnibusNome(`${item.codigo} - ${item.placa}`);
+                  setOnibusPlaca(item.placa); 
                   setModalOnibus(false);
                 }}
               >
@@ -173,6 +146,7 @@ useEffect(() => {
         </View>
       </Modal>
 
+      {/* MODAL SELEÇÃO PARADAS */}
       <Modal visible={modalVisible} animationType="slide" transparent>
         <View style={styles.modalOverlay}>
           <View style={styles.modalContainer}>
@@ -207,8 +181,16 @@ useEffect(() => {
         placeholderTextColor="#64748B"
         value={nome}
         onChangeText={setNome}
-      />
+      /> 
+      <TextInput
+            style={styles.input}
+            placeholder="Código da rota (Ex: ROTA003)"
+            placeholderTextColor="#64748B"
+            value={codigoRota}
+            onChangeText={setCodigoRota}
+          />
 
+      {/* INPUT VISUAL DA QUILOMETRAGEM ADICIONADO */}
       <TextInput
         style={styles.input}
         placeholder="Quilometragem da rota (km)"
@@ -220,13 +202,13 @@ useEffect(() => {
 
       <TouchableOpacity style={styles.input} onPress={() => setModalMotorista(true)}>
         <Text style={{ color: motoristaNome ? '#1E293B' : '#64748B' }}>
-          {motoristaNome || 'Selecionar motorista'}
+          {motoristaNome ? `Motorista: ${motoristaNome}` : 'Selecionar motorista'}
         </Text>
       </TouchableOpacity>
 
       <TouchableOpacity style={styles.input} onPress={() => setModalOnibus(true)}>
-        <Text style={{ color: onibusNome ? '#1E293B' : '#64748B' }}>
-          {onibusNome || 'Selecionar ônibus'}
+        <Text style={{ color: onibusPlaca ? '#1E293B' : '#64748B' }}>
+          {onibusPlaca ? `Veículo (Placa): ${onibusPlaca}` : 'Selecionar ônibus'}
         </Text>
       </TouchableOpacity>
 
@@ -235,11 +217,11 @@ useEffect(() => {
       </TouchableOpacity>
 
       <Text style={styles.infoParadas}>
-        {paradasSelecionadas.length} parada(s) selecionada(s)
+        {paradasSelecionadas.length} parada(s) widgets selecionada(s)
       </Text>
 
       <TouchableOpacity style={styles.button} onPress={cadastrar}>
-        <Text style={styles.buttonText}>Cadastrar</Text>
+        <Text style={styles.buttonText}>Cadastrar Rota</Text>
       </TouchableOpacity>
     </View>
   );

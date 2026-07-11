@@ -1,7 +1,6 @@
 import { View, Text, StyleSheet, TextInput, FlatList, Pressable, Modal, ActivityIndicator, Alert } from 'react-native';
 import { useState, useEffect } from 'react';
 
-
 import { listarRotas, atualizarRota, deletarRota, Rotas } from '../../services/rotaService'; 
 import { listarMotoristas, Motorista } from '../../services/motoristaService';
 import { listarOnibus, Onibus } from '../../services/onibusService';
@@ -19,11 +18,14 @@ export default function MonitoramentoScreen() {
   const [modalEditarVisivel, setModalEditarVisivel] = useState(false);
   const [idEditando, setIdEditando] = useState('');
   const [nomeEditando, setNomeEditando] = useState('');
+  const [modalDeletarVisible, setModalDeletarVisible] = useState(false);
+const [rotaParaDeletar, setRotaParaDeletar] = useState<any>(null);
+
   const [idOnibusSelecionado, setIdOnibusSelecionado] = useState('');
   const [idMotoristaSelecionado, setIdMotoristaSelecionado] = useState('');
+  
   const [modalSeletorOnibusVisivel, setModalSeletorOnibusVisivel] = useState(false);
   const [modalSeletorMotoristaVisivel, setModalSeletorMotoristaVisivel] = useState(false);
-
   const [localizacoes, setLocalizacoes] = useState<Localizacao[]>([]);
 
   const precoDiesel = 5.90; 
@@ -32,7 +34,6 @@ export default function MonitoramentoScreen() {
   const carregarDadosIniciais = async () => {
     try {
       setCarregando(true);
-      
       const dadosRotas = await listarRotas();
       setListaRotas(Array.isArray(dadosRotas) ? dadosRotas : (dadosRotas.data || []));
 
@@ -41,7 +42,6 @@ export default function MonitoramentoScreen() {
 
       const dadosMotoristas = await listarMotoristas();
       setTodosMotoristas(Array.isArray(dadosMotoristas) ? dadosMotoristas : (dadosMotoristas.data || []));
-
     } catch (error) {
       Alert.alert('Erro', 'Não foi possível carregar os dados do servidor.');
     } finally {
@@ -55,11 +55,9 @@ export default function MonitoramentoScreen() {
 
   useEffect(() => {
     carregarMapa();
-
     const intervalo = setInterval(() => {
       carregarMapa();
     }, 10000); 
-
     return () => clearInterval(intervalo);
   }, []);
 
@@ -71,17 +69,14 @@ export default function MonitoramentoScreen() {
       console.log("Erro ao carregar mapa", err);
     }
   }
-
-   const onibusAtual = todosOnibus.find(o => (o._id || o.id) === idOnibusSelecionado || o.placa === idOnibusSelecionado);
-  const motoristaAtual = todosMotoristas.find(m => (m._id || m.id) === idMotoristaSelecionado || m.nome === idMotoristaSelecionado);
-
+  const onibusAtual = todosOnibus.find(o => o.placa === idOnibusSelecionado);
+  const motoristaAtual = todosMotoristas.find(m => m.nome === idMotoristaSelecionado);
 
   const rotasFiltradas = listaRotas.filter((rota) => {
     const nomeRota = rota.nome?.toLowerCase() || '';
     const nomeMotorista = typeof rota.idMotorista === 'object' 
       ? (rota.idMotorista?.nome || '').toLowerCase() 
       : (rota.idMotorista || rota.motorista || '').toLowerCase();
-
     return nomeRota.includes(busca.toLowerCase()) || nomeMotorista.includes(busca.toLowerCase());
   });
 
@@ -91,140 +86,73 @@ export default function MonitoramentoScreen() {
   }
 
   function iniciarEdicao(item: Rotas) {
-    console.log('🏁 RASTREIO [Passo 1.1] - Iniciando edição da rota. Dados brutos recebidos do card:', item);
     
     setIdEditando(item._id?.toString() || item.id?.toString() || '');
     setNomeEditando(item.nome || '');
     
-    const textoOnibus = typeof item.idOnibus === 'object' ? item.idOnibus?.placa : item.idOnibus;
-    const textoMotorista = typeof item.idMotorista === 'object' ? item.idMotorista?.nome : item.idMotorista;
-    
-    console.log(` RASTREIO [Passo 1.2] - Textos extraídos para busca -> Ônibus/Placa: "${textoOnibus}", Motorista: "${textoMotorista}"`);
-    console.log(` RASTREIO [Passo 1.3] - Listas disponíveis para comparação -> Total Ônibus: ${todosOnibus.length}, Total Motoristas: ${todosMotoristas.length}`);
+    const textoOnibus = typeof item.idOnibus === 'object' ? item.idOnibus?.placa : (item.idOnibus || item.onibus || '');
+    const textoMotorista = typeof item.idMotorista === 'object' ? item.idMotorista?.nome : (item.idMotorista || item.motorista || '');
 
-    const onibusEncontrado = todosOnibus.find(o => o.placa?.trim().toLowerCase() === textoOnibus?.trim().toLowerCase());
-    const motoristaEncontrado = todosMotoristas.find(m => m.nome?.trim().toLowerCase() === textoMotorista?.trim().toLowerCase());
-
-    console.log(' RASTREIO [Passo 1.4] - Resultado da busca interna -> Ônibus Objeto:', onibusEncontrado, ' | Motorista Objeto:', motoristaEncontrado);
-
-    const idOnibusDefinido = onibusEncontrado?._id || onibusEncontrado?.id || textoOnibus || '';
-    const idMotoristaDefinido = motoristaEncontrado?._id || motoristaEncontrado?.id || textoMotorista || '';
-
-    setIdOnibusSelecionado(idOnibusDefinido);
-    setIdMotoristaSelecionado(idMotoristaDefinido);
-    
-    console.log(` RASTREIO [Passo 1.5] - Estados locais definidos -> idOnibusSelecionado: "${idOnibusDefinido}", idMotoristaSelecionado: "${idMotoristaDefinido}"`);
+      setIdOnibusSelecionado(textoOnibus);
+    setIdMotoristaSelecionado(textoMotorista);
     
     setModalEditarVisivel(true);
-    console.log(' RASTREIO [Passo 1.6] - Comando setModalEditarVisivel(true) disparado.');
   }
 
   async function salvarAlteracoesBackend() {
-    console.log(' RASTREIO [Passo 2.1] - Botão "Salvar" foi clicado na interface.');
-    console.log(` RASTREIO [Passo 2.2] - Estados atuais antes de processar -> idOnibusSelecionado: "${idOnibusSelecionado}", idMotoristaSelecionado: "${idMotoristaSelecionado}"`);
-
-    const onibusObjeto = todosOnibus.find(o => (o._id || o.id) === idOnibusSelecionado);
-    const motoristaObjeto = todosMotoristas.find(m => (m._id || m.id) === idMotoristaSelecionado);
-
-    const placaDoOnibusEscolhido = onibusObjeto ? onibusObjeto.placa : idOnibusSelecionado;
-    const nomeDoMotoristaEscolhido = motoristaObjeto ? motoristaObjeto.nome : idMotoristaSelecionado;
-
-    console.log(` RASTREIO [Passo 2.3] - Strings finais resolvidas para envio -> Placa: "${placaDoOnibusEscolhido}", Motorista: "${nomeDoMotoristaEscolhido}"`);
-
-    if (!nomeEditando || !placaDoOnibusEscolhido || !nomeDoMotoristaEscolhido) {
-      console.log(' RASTREIO [Passo 2.4 - FALHA] - Validação falhou! Campos obrigatórios vazios:', {
-        nomeEditando,
-        placaDoOnibusEscolhido,
-        nomeDoMotoristaEscolhido
-      });
-      Alert.alert('Erro', 'Por favor, selecione o ônibus e o motorista.');
+   
+    if (!nomeEditando || !idOnibusSelecionado || !idMotoristaSelecionado) {
+      Alert.alert('Erro', 'Por favor, preencha todos os campos obrigatórios.');
       return;
     }
-
-    console.log(' RASTREIO [Passo 2.5 - SUCESSO] - Validação passou. Preparando chamada HTTP Axios...');
 
     try {
       setCarregando(true);
       
-      const payloadEnvio = {
+       const payloadEnvio = {
         nome: nomeEditando,
-        idOnibus: placaDoOnibusEscolhido,     
-        idMotorista: nomeDoMotoristaEscolhido  
+        idOnibus: idOnibusSelecionado,       
+        idMotorista: idMotoristaSelecionado  
       };
       
-      console.log(` RASTREIO [Passo 2.6] - Enviando PUT/PATCH para ID Rota: "${idEditando}". Payload:`, payloadEnvio);
+      console.log(` Enviando atualização para ID: "${idEditando}". Payload:`, payloadEnvio);
 
-
-      const respostaServidor = await atualizarRota(idEditando, payloadEnvio);
+      await atualizarRota(idEditando, payloadEnvio);
       
-      console.log(' RASTREIO [Passo 2.7] - Resposta de sucesso retornada pela API:', respostaServidor);
-
-      Alert.alert('Sucesso', 'Rota atualizada com sucesso!');
-      
+      Alert.alert('Sucesso', 'Rota updated com sucesso!');
       setModalEditarVisivel(false);
-      console.log(' RASTREIO [Passo 2.8] - Modal de edição fechado.');
-      
-      console.log(' RASTREIO [Passo 2.9] - Recarregando dados iniciais da tela...');
       await carregarDadosIniciais();
-      console.log(' RASTREIO [Passo 2.10] - Fluxo completo finalizado.');
-      
     } catch (error: any) {
-      console.log(' RASTREIO [Passo 2.E - ERRO CRÍTICO NO BACKEND] ->', error);
-      if (error.response) {
-        console.log(' RASTREIO - Dados de erro do Axios:', error.response.data);
-      }
-      Alert.alert('Erro', 'Não foi possível salvar as alterações.');
+      console.log(' Erro retornado pelo servidor:', error.response?.data || error.message);
+      Alert.alert('Erro', 'Não foi possível salvar as alterações no banco de dados.');
     } finally {
       setCarregando(false);
     }
   }
 
- 
-  async function lidarComDeletar(id: string) {
-    if (!id) {
-      Alert.alert('Erro', 'ID da rota inválido.');
-      return;
+ async function lidarComDeletar(item: any) {
+    const id = item._id;
+    if (!id) return;
+
+    try {
+      setCarregando(true);
+      
+     
+      await deletarRota(id); 
+      
+   
+      setListaRotas((rotasAtuais) => rotasAtuais.filter(rota => rota._id !== id));
+    } catch (error) {
+      console.log('Erro ao deletar:', error);
+    } finally {
+      setCarregando(false);
     }
-
-    Alert.alert(
-      "Confirmar Exclusão",
-      "Tem certeza que deseja deletar esta rota permanentemente?",
-      [
-        { text: "Cancelar", style: "cancel" },
-        { 
-          text: "Excluir", 
-          style: "destructive", 
-          onPress: async () => {
-            try {
-              setCarregando(true);
-              await deletarRota(id); 
-
-              setListaRotas((rotasAtuais) => 
-                rotasAtuais.filter(rota => {
-                  const rId = rota._id?.toString() || rota.id?.toString();
-                  return rId !== id;
-                })
-              );
-              
-              Alert.alert("Sucesso", "Rota excluída com sucesso!");
-            } catch (error) {
-              Alert.alert('Erro', 'Não foi possível deletar a rota do servidor.');
-            } finally {
-              setCarregando(false);
-            }
-          }
-        }
-      ]
-    );
   }
-
-  
-    
-  
 
   return (
     <View style={styles.container}>
       
+      {/* MODAL DETALHES */}
       <Modal animationType="fade" transparent={true} visible={modalDetalhesVisivel} onRequestClose={() => setModalDetalhesVisivel(false)}>
         <View style={styles.modalOverlay}>
           <View style={styles.modalContent}>
@@ -232,13 +160,7 @@ export default function MonitoramentoScreen() {
             {rotaSelecionada && (
               <View style={styles.modalBody}>
                 <View style={styles.mapContainer}>
-                  <Mapa 
-                    localizacoes={localizacoes}
-                    paradas={rotaSelecionada.paradas || []}
-                    mostrarOnibus={true}
-                    mostrarParadas={true}
-                    mostrarRota={true}
-                  />
+                  <Mapa localizacoes={localizacoes} paradas={rotaSelecionada.paradas || []} mostrarOnibus={true} mostrarParadas={true} mostrarRota={true} />
                 </View>
                 <Text style={styles.modalTextoLinha}><Text style={styles.boldText}>Linha: </Text>{rotaSelecionada.nome}</Text>
                 <Text style={styles.modalTexto}>
@@ -262,6 +184,7 @@ export default function MonitoramentoScreen() {
         </View>
       </Modal>
 
+      {/* MODAL EDITAR */}
       <Modal animationType="slide" transparent={true} visible={modalEditarVisivel} onRequestClose={() => setModalEditarVisivel(false)}>
         <View style={styles.modalOverlay}>
           <View style={styles.modalContent}>
@@ -298,15 +221,16 @@ export default function MonitoramentoScreen() {
         </View>
       </Modal>
 
+      {/* SELETOR ÔNIBUS */}
       <Modal animationType="fade" transparent={true} visible={modalSeletorOnibusVisivel} onRequestClose={() => setModalSeletorOnibusVisivel(false)}>
         <View style={styles.subModalOverlay}>
           <View style={styles.subModalContent}>
             <Text style={styles.subModalTitle}>Selecione o Veículo</Text>
             <FlatList
               data={todosOnibus}
-              keyExtractor={(item) => (item._id || item.id).toString()}
+              keyExtractor={(item) => (item._id || item.id || item.placa).toString()}
               renderItem={({ item }) => (
-                <Pressable style={styles.itemSelecao} onPress={() => { setIdOnibusSelecionado(item._id || item.id); setModalSeletorOnibusVisivel(false); }}>
+                <Pressable style={styles.itemSelecao} onPress={() => { setIdOnibusSelecionado(item.placa); setModalSeletorOnibusVisivel(false); }}>
                   <Text style={styles.itemSelecaoTexto}>{item.placa} {item.modelo ? `- ${item.modelo}` : ''}</Text>
                 </Pressable>
               )}
@@ -318,15 +242,16 @@ export default function MonitoramentoScreen() {
         </View>
       </Modal>
 
+      {/* SELETOR MOTORISTA */}
       <Modal animationType="fade" transparent={true} visible={modalSeletorMotoristaVisivel} onRequestClose={() => setModalSeletorMotoristaVisivel(false)}>
         <View style={styles.subModalOverlay}>
           <View style={styles.subModalContent}>
             <Text style={styles.subModalTitle}>Selecione o Motorista</Text>
             <FlatList
               data={todosMotoristas}
-              keyExtractor={(item) => (item._id || item.id).toString()}
+              keyExtractor={(item) => (item._id || item.id || item.nome).toString()}
               renderItem={({ item }) => (
-                <Pressable style={styles.itemSelecao} onPress={() => { setIdMotoristaSelecionado(item._id || item.id); setModalSeletorMotoristaVisivel(false); }}>
+                <Pressable style={styles.itemSelecao} onPress={() => { setIdMotoristaSelecionado(item.nome); setModalSeletorMotoristaVisivel(false); }}>
                   <Text style={styles.itemSelecaoTexto}>{item.nome}</Text>
                 </Pressable>
               )}
@@ -338,6 +263,7 @@ export default function MonitoramentoScreen() {
         </View>
       </Modal>
 
+      {/* LISTA PRINCIPAL */}
       <View style={styles.searchContainer}>
         <Text style={styles.mainTitle}>Monitoramento de Frota</Text>
         <TextInput style={styles.searchInput} placeholder="Buscar rota ou motorista..." placeholderTextColor="#94A3B8" value={busca} onChangeText={setBusca} />
@@ -366,7 +292,6 @@ export default function MonitoramentoScreen() {
                   <Text style={styles.boldText}>Motorista: </Text>
                   {typeof item.idMotorista === 'object' ? item.idMotorista?.nome : (item.idMotorista || item.motorista || 'Não informado')}
                 </Text>
-
                 <View style={{ flexDirection: 'row', gap: 6, flexWrap: 'wrap', marginTop: 6 }}>
                   <View style={[styles.statusBadge, { backgroundColor: item.status === 'Atrasado' ? '#FEE2E2' : '#D1FAE5' }]}>
                     <Text style={[styles.statusText, { color: item.status === 'Atrasado' ? '#991B1B' : '#065F46' }]}>{item.status || 'Em andamento'}</Text>
@@ -377,7 +302,7 @@ export default function MonitoramentoScreen() {
               <View style={styles.direitaCard}>
                 <Pressable style={styles.botaoAcao} onPress={() => verDetalhes(item)}><Text style={styles.textoBotaoAcao}>Detalhes</Text></Pressable>
                 <Pressable style={styles.botaoEditar} onPress={() => iniciarEdicao(item)}><Text style={styles.textoBotaoEditar}>Editar</Text></Pressable>
-                <Pressable style={[styles.botaoAcao, styles.botaoDeletar]} onPress={() => lidarComDeletar(item._id?.toString() || item.id?.toString() || '')}>
+                <Pressable style={[styles.botaoAcao, styles.botaoDeletar]} onPress={() => lidarComDeletar(item)}>
                   <Text style={styles.textoBotaoDeletar}>Excluir</Text>
                 </Pressable>
               </View>
