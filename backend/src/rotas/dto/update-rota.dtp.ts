@@ -7,11 +7,11 @@ export class UpdateRotaDto {
 
   @IsString()
   @IsOptional()
-  motorista?: string;
+  idMotorista?: string;
 
   @IsString()
   @IsOptional()
-  onibus?: string;
+  idOnibus?: string;
 
   @IsNumber()
   @IsOptional()
