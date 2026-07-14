@@ -199,8 +199,9 @@ export default function AlertasScreen() {
                 </View>
 
                 <Text style={styles.idOnibus}>
-                  {item.idOnibus.codigo} -{' '}
-                  {item.idOnibus.placa}
+                  {item.idOnibus?.codigo && item.idOnibus?.placa
+                    ? `${item.idOnibus.codigo} - ${item.idOnibus.placa}`
+                    : 'Ônibus não encontrado'}
                 </Text>
 
                 {item.descricao && (

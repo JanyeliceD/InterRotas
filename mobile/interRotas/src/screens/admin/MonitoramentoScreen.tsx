@@ -35,13 +35,13 @@ const [rotaParaDeletar, setRotaParaDeletar] = useState<any>(null);
     try {
       setCarregando(true);
       const dadosRotas = await listarRotas();
-      setListaRotas(Array.isArray(dadosRotas) ? dadosRotas : (dadosRotas.data || []));
+      setListaRotas(Array.isArray(dadosRotas) ? dadosRotas : []);
 
       const dadosOnibus = await listarOnibus();
-      setTodosOnibus(Array.isArray(dadosOnibus) ? dadosOnibus : (dadosOnibus.data || []));
+      setTodosOnibus(Array.isArray(dadosOnibus) ? dadosOnibus : []);
 
       const dadosMotoristas = await listarMotoristas();
-      setTodosMotoristas(Array.isArray(dadosMotoristas) ? dadosMotoristas : (dadosMotoristas.data || []));
+      setTodosMotoristas(Array.isArray(dadosMotoristas) ? dadosMotoristas : []);
     } catch (error) {
       Alert.alert('Erro', 'Não foi possível carregar os dados do servidor.');
     } finally {
@@ -63,8 +63,21 @@ const [rotaParaDeletar, setRotaParaDeletar] = useState<any>(null);
 
   async function carregarMapa() {
     try {
+      if (!rotaSelecionada) {
+        return;
+      }
+
       const dados = await listarLocalizacoes();
-      setLocalizacoes(dados);
+      const localizacoesDaRota = (Array.isArray(dados) ? dados : []).filter((loc) => {
+        const idOnibusLocalizacao = typeof loc.idOnibus === 'string' ? loc.idOnibus : loc.idOnibus?._id;
+        const idOnibusRota = typeof rotaSelecionada.idOnibus === 'string'
+          ? rotaSelecionada.idOnibus
+          : (rotaSelecionada.idOnibus as { _id?: string } | undefined)?._id;
+
+        return idOnibusLocalizacao === idOnibusRota;
+      });
+
+      setLocalizacoes(localizacoesDaRota);
     } catch (err) {
       console.log("Erro ao carregar mapa", err);
     }
@@ -90,10 +103,10 @@ const [rotaParaDeletar, setRotaParaDeletar] = useState<any>(null);
     setIdEditando(item._id?.toString() || item.id?.toString() || '');
     setNomeEditando(item.nome || '');
     
-    const textoOnibus = typeof item.idOnibus === 'object' ? item.idOnibus?.placa : (item.idOnibus || item.onibus || '');
-    const textoMotorista = typeof item.idMotorista === 'object' ? item.idMotorista?.nome : (item.idMotorista || item.motorista || '');
+    const textoOnibus = typeof item.idOnibus === 'object' ? (item.idOnibus?.placa || '') : (item.idOnibus || item.onibus || '');
+    const textoMotorista = typeof item.idMotorista === 'object' ? (item.idMotorista?.nome || '') : (item.idMotorista || item.motorista || '');
 
-      setIdOnibusSelecionado(textoOnibus);
+    setIdOnibusSelecionado(textoOnibus);
     setIdMotoristaSelecionado(textoMotorista);
     
     setModalEditarVisivel(true);
@@ -160,7 +173,12 @@ const [rotaParaDeletar, setRotaParaDeletar] = useState<any>(null);
             {rotaSelecionada && (
               <View style={styles.modalBody}>
                 <View style={styles.mapContainer}>
-                  <Mapa localizacoes={localizacoes} paradas={rotaSelecionada.paradas || []} mostrarOnibus={true} mostrarParadas={true} mostrarRota={true} />
+                  <Mapa 
+                  localizacoes={localizacoes} 
+                  paradas={rotaSelecionada.paradas} 
+                  mostrarOnibus={true} mostrarParadas={true} 
+                  mostrarRota={true} 
+                  />
                 </View>
                 <Text style={styles.modalTextoLinha}><Text style={styles.boldText}>Linha: </Text>{rotaSelecionada.nome}</Text>
                 <Text style={styles.modalTexto}>

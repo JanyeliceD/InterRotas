@@ -67,6 +67,18 @@ export default function DashboardScreen() {
 
   async function carregarMapa() {
     const dados = await listarLocalizacoes();
+    
+    console.log("Quantidade:", dados.length);
+
+    dados.forEach((item) => {
+        console.log(
+            item.idOnibus?.codigo,
+            item.idOnibus?.placa,
+            item.latitude,
+            item.longitude
+        );
+    });
+
     setTodosOsOnibus(dados);
 }
 
@@ -136,7 +148,7 @@ export default function DashboardScreen() {
 
                 {(item.quilometragem || 0) >= 5000 && (
                   <View style={styles.manutencaoBadge}>
-                    <Text style={styles.manutencaoText}>⚠️ REQUER TROCA DE ÓLEO</Text>
+                    <Text style={styles.manutencaoText}>REQUER TROCA DE ÓLEO</Text>
                   </View>
                 )}
               </View>

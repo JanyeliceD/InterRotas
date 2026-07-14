@@ -6,6 +6,7 @@ import {
   TouchableOpacity,
   Alert,
   Modal,
+  FlatList,
 } from 'react-native';
 import { useState, useEffect } from 'react';
 import { Motorista } from '../../types/motorista';
@@ -40,9 +41,9 @@ export default function CadastrarRotaScreen({ navigation }: { navigation: any })
         const onibusApi = await listarOnibus();
         const paradasApi = await listarParadas();
 
-        setMotorista(motoristasApi);
-        setOnibus(onibusApi);
-        setParadas(paradasApi);
+        setMotorista(motoristasApi as Motorista[]);
+        setOnibus(onibusApi as Onibus[]);
+        setParadas(paradasApi as Parada[]);
       } catch (error: any) {
         console.log('Erro ao carregar dados iniciais:', error.response?.data || error.message);
         Alert.alert('Erro', 'Não foi possível carregar os dados.');
@@ -52,8 +53,9 @@ export default function CadastrarRotaScreen({ navigation }: { navigation: any })
   }, []);
 
   function toggleParada(paradaId: string) {
-    if (paradasSelecionadas.includes(paradaId)) {
-      setParadasSelecionadas(paradasSelecionadas.filter((item) => item !== paradaId));
+    const jaSelecionada = paradasSelecionadas.includes(paradaId);
+    if (jaSelecionada) {
+      setParadasSelecionadas(paradasSelecionadas.filter((id) => id !== paradaId));
     } else {
       setParadasSelecionadas([...paradasSelecionadas, paradaId]);
     }
@@ -66,14 +68,16 @@ export default function CadastrarRotaScreen({ navigation }: { navigation: any })
     }
 
     try {
-       const payload = {
-        codigo: codigoRota,              
-        nome: nome,                       
-        idOnibus: onibusPlaca,           
-        idMotorista: motoristaNome,        
-        motorista: motoristaNome,          
-        quilometragem: Number(quilometragem), 
-        paradas: paradasSelecionadas,     
+      const paradasSelecionadasObj = paradas.filter((parada) => paradasSelecionadas.includes(parada._id));
+      
+      const payload = {
+        codigo: codigoRota,
+        nome: nome,
+        idOnibus: onibusPlaca,
+        idMotorista: motoristaNome,
+        motorista: motoristaNome,
+        quilometragem: Number(quilometragem),
+        paradas: paradasSelecionadasObj,
       };
 
       console.log('Enviando formato exato:', payload);
@@ -103,72 +107,151 @@ export default function CadastrarRotaScreen({ navigation }: { navigation: any })
     <View style={styles.container}>
       
       {/* MODAL SELEÇÃO MOTORISTA */}
-      <Modal visible={modalMotorista} transparent animationType="slide">
+      <Modal
+        visible={modalMotorista}
+        transparent
+        animationType="slide"
+        onRequestClose={() => setModalMotorista(false)}
+      >
         <View style={styles.modalOverlay}>
           <View style={styles.modalContainer}>
-            <Text style={styles.modalTitulo}>Selecione o Motorista</Text>
-            {motorista.map((item) => (
-              <TouchableOpacity
-                key={item._id}
-                style={styles.paradaItem}
-                onPress={() => {
-                  setidMotorista(item._id);
-                  setMotoristaNome(item.nome); 
-                  setModalMotorista(false);
-                }}
-              >
-                <Text>{item.matricula} - {item.nome}</Text>
-              </TouchableOpacity>
-            ))}
+
+            <Text style={styles.modalTitulo}>
+              Selecione o Motorista
+            </Text>
+
+            <FlatList
+              data={motorista}
+              keyExtractor={(item) => item._id}
+              style={styles.listaParadas}
+              renderItem={({ item }) => (
+                <TouchableOpacity
+                  style={styles.paradaItem}
+                  onPress={() => {
+                    setidMotorista(item._id);
+                    setMotoristaNome(item.nome);
+                    setModalMotorista(false);
+                  }}
+                >
+                  <Text>
+                    {item.matricula} - {item.nome}
+                  </Text>
+                </TouchableOpacity>
+              )}
+            />
+
+            <TouchableOpacity
+              style={styles.botaoCancelarSeletor}
+              onPress={() => setModalMotorista(false)}
+            >
+              <Text style={styles.buttonText}>
+                Cancelar
+              </Text>
+            </TouchableOpacity>
+
           </View>
         </View>
       </Modal>
 
       {/* MODAL SELEÇÃO ÔNIBUS */}
-      <Modal visible={modalOnibus} transparent animationType="slide">
+      <Modal
+        visible={modalOnibus}
+        transparent
+        animationType="slide"
+        onRequestClose={() => setModalOnibus(false)}
+      >
         <View style={styles.modalOverlay}>
           <View style={styles.modalContainer}>
-            <Text style={styles.modalTitulo}>Selecione o Ônibus</Text>
-            {onibus.map((item) => (
-              <TouchableOpacity
-                key={item._id}
-                style={styles.paradaItem}
-                onPress={() => {
-                  setidOnibus(item._id);
-                  setOnibusPlaca(item.placa); 
-                  setModalOnibus(false);
-                }}
-              >
-                <Text>{item.codigo} - {item.placa}</Text>
-              </TouchableOpacity>
-            ))}
+
+            <Text style={styles.modalTitulo}>
+              Selecione o Ônibus
+            </Text>
+
+            <FlatList
+              data={onibus}
+              keyExtractor={(item) => item._id}
+              style={styles.listaParadas}
+              renderItem={({ item }) => (
+                <TouchableOpacity
+                  style={styles.paradaItem}
+                  onPress={() => {
+                    setidOnibus(item._id);
+                    setOnibusPlaca(item.placa);
+                    setModalOnibus(false);
+                  }}
+                >
+                  <Text>
+                    {item.codigo} - {item.placa}
+                  </Text>
+                </TouchableOpacity>
+              )}
+            />
+
+            <TouchableOpacity
+              style={styles.botaoCancelarSeletor}
+              onPress={() => setModalOnibus(false)}
+            >
+              <Text style={styles.buttonText}>
+                Cancelar
+              </Text>
+            </TouchableOpacity>
+
           </View>
         </View>
       </Modal>
 
       {/* MODAL SELEÇÃO PARADAS */}
-      <Modal visible={modalVisible} animationType="slide" transparent>
+      <Modal 
+      visible={modalVisible} 
+      animationType="slide" 
+      transparent
+      onRequestClose={() => setModalVisible(false)}
+      >
         <View style={styles.modalOverlay}>
           <View style={styles.modalContainer}>
             <Text style={styles.modalTitulo}>Selecione as Paradas</Text>
-            {paradas.map((parada) => {
-              const selecionada = paradasSelecionadas.includes(parada._id);
-              return (
-                <TouchableOpacity
-                  key={parada._id}
-                  style={[styles.paradaItem, selecionada && styles.paradaSelecionada]}
-                  onPress={() => toggleParada(parada._id)}
-                >
-                  <Text style={styles.paradaTexto}>{parada.nome}</Text>
-                </TouchableOpacity>
-              );
-            })}
-            <TouchableOpacity style={styles.button} onPress={() => { navigation.navigate('CadastrarParada'); setModalVisible(false); }}>
-              <Text style={styles.buttonText}>Nova parada</Text>
-            </TouchableOpacity>
-            <TouchableOpacity style={styles.button} onPress={() => setModalVisible(false)}>
-              <Text style={styles.buttonText}>Concluir</Text>
-            </TouchableOpacity>
+            <FlatList
+              data={paradas}
+              keyExtractor={(item) => item._id}
+              style={styles.listaParadas}
+              renderItem={({ item }) => {
+                const selecionada = paradasSelecionadas.includes(item._id);
+
+                return (
+                  <TouchableOpacity
+                    style={[
+                      styles.paradaItem,
+                      selecionada && styles.paradaSelecionada,
+                    ]}
+                    onPress={() => toggleParada(item._id)}
+                  >
+                    <Text style={styles.paradaTexto}>
+                      {item.nome}
+                    </Text>
+                  </TouchableOpacity>
+
+                );
+              }}
+            />
+            <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
+              <TouchableOpacity
+                style={[styles.botaoCancelarSeletor, { flex: 1, marginRight: 8 }]}
+                onPress={() => setModalVisible(false)}
+              >
+                <Text style={styles.buttonText}>
+                  Cancelar
+                </Text>
+              </TouchableOpacity>
+
+              <TouchableOpacity
+                style={[styles.button, { flex: 1, marginBottom: 0 }]}
+                onPress={() => setModalVisible(false)}
+              >
+                <Text style={styles.buttonText}>
+                  Concluir
+                </Text>
+              </TouchableOpacity>
+            </View>
           </View>
         </View>
       </Modal>
@@ -237,9 +320,21 @@ const styles = StyleSheet.create({
   buttonTextParada: { color: '#1E293B', fontWeight: 'bold', fontSize: 16 },
   infoParadas: { marginBottom: 16, color: '#475569' },
   modalOverlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.5)', justifyContent: 'center', padding: 16 },
-  modalContainer: { backgroundColor: '#FFF', borderRadius: 12, padding: 20 },
+  modalContainer: {
+    backgroundColor: '#FFF',
+    borderRadius: 12,
+    padding: 20,
+    maxHeight: '80%',
+    width: '100%',
+  },
   modalTitulo: { fontSize: 20, fontWeight: 'bold', marginBottom: 16, color: '#1E40AF' },
   paradaItem: { padding: 14, borderWidth: 1, borderColor: '#CBD5E1', borderRadius: 8, marginBottom: 10 },
   paradaSelecionada: { backgroundColor: '#DBEAFE', borderColor: '#1E40AF' },
-  paradaTexto: { fontSize: 16 }
+  paradaTexto: { fontSize: 16 },
+  botaoCancelarSeletor: { backgroundColor: '#64748B', paddingVertical: 12, borderRadius: 8, alignItems: 'center', marginTop: 10 },
+  mapContainer: { height: 300, borderRadius: 12, overflow: 'hidden', marginBottom: 12 },
+  listaParadas: {
+  maxHeight: 300,
+  marginBottom: 15,
+},
 });

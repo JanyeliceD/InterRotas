@@ -9,11 +9,16 @@ export interface CreateRotaDto {
 }
 
 export interface Rotas {
-    _id: string;
+    _id?: string;
+    id?: string;
     nome: string;
-    idMotorista: string;
-    idOnibus: string;
-    paradas: string[];
+    idMotorista: string | { _id?: string; nome?: string };
+    idOnibus: string | { _id?: string; placa?: string };
+    paradas: any[];
+    quilometragem?: number;
+    status?: string;
+    motorista?: string;
+    onibus?: string;
 }
 export async function  cadastrarRota(dados:CreateRotaDto) {
     const response = await api.post('/rotas', dados);

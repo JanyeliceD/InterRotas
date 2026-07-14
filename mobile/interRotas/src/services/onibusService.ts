@@ -1,9 +1,11 @@
 import { api } from './api';
 
 export interface Onibus {
-    _id: string;
-    codigo: string;
+    _id?: string;
+    id?: string;
+    codigo?: string;
     placa: string;
+    modelo?: string;
 }
 
 export interface CreateOnibusDto {
