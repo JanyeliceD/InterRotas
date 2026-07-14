@@ -109,8 +109,8 @@ export default function DashboardScreen() {
 
       <View style={styles.mapContainer}>
          <Mapa 
-         localizacoes={todosOsOnibus}
-         mostrarOnibus={true}
+          localizacoes={todosOsOnibus}
+          mostrarOnibus={true}
           mostrarParadas={false}
           mostrarRota={false}
          />

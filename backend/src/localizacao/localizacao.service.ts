@@ -50,9 +50,62 @@ export class LocalizacaoService {
             .sort({ timestamp: -1 });
     }
 
-    async listar() {
+    async listarHIstorico() {
     return this.localizacaoModel
         .find()
         .populate('idOnibus');
+    }
+
+    //ordena do mais novo para mais antigo e pega a primeira localizacao
+    async listarUltimasLocalizacoes() {
+
+        const localizacoes = await this.localizacaoModel
+            .find()
+            .sort({ timestamp: -1 })
+            .populate('idOnibus');
+
+        const mapa = new Map();
+
+        for (const loc of localizacoes) {
+
+            if (!loc.idOnibus) continue;
+
+            const id = loc.idOnibus._id.toString();
+
+            if (!mapa.has(id)) {
+                mapa.set(id, loc);
+            }
+        }
+
+        return [...mapa.values()];
+    }
+
+    async listarHistoricoOnibus(idOnibus: string) {
+
+    return this.localizacaoModel
+        .find({
+            idOnibus: new mongoose.Types.ObjectId(idOnibus)
+        })
+        .sort({ timestamp: 1 })
+        .populate('idOnibus');
+    }
+
+    async listarPorOnibus(idOnibus: string) {
+    return this.localizacaoModel
+        .find({
+            idOnibus: new mongoose.Types.ObjectId(idOnibus),
+        })
+        .sort({ timestamp: 1 })
+        .populate('idOnibus');
+    }
+
+    async remover(id: string) {
+        const localizacao = await this.localizacaoModel.findByIdAndDelete(id);
+
+        if (!localizacao) {
+            throw new NotFoundException('Localização não encontrada');
+        }
+
+        return localizacao;
     }
 }

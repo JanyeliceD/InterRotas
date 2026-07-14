@@ -12,7 +12,6 @@ type MapaProps = {
   zoom?: number;
   paradas?: Parada[];
 
-  // Controle do que será exibido
   mostrarOnibus?: boolean;
   mostrarParadas?: boolean;
   mostrarRota?: boolean;
@@ -27,136 +26,191 @@ export default function Mapa({
   mostrarRota = false,
 }: MapaProps) {
 
-  const centro =
-    localizacoes.length > 0
-      ? {
-          latitude: localizacoes[0].latitude,
-          longitude: localizacoes[0].longitude,
-        }
-      : {
-          latitude: -6.458,
-          longitude: -37.097,
-        };
+  // Define um centro inicial
+  let centro = {
+    latitude: -6.458,
+    longitude: -37.097,
+  };
+
+  if (mostrarParadas && paradas.length > 0) {
+    centro = {
+      latitude: paradas[0].latitude,
+      longitude: paradas[0].longitude,
+    };
+  } else if (localizacoes.length > 0) {
+    centro = {
+      latitude: localizacoes[0].latitude,
+      longitude: localizacoes[0].longitude,
+    };
+  }
 
   const html = `
-    <!DOCTYPE html>
-    <html>
-      <head>
-        <meta charset="utf-8"/>
+<!DOCTYPE html>
+<html>
 
-        <link
-          rel="stylesheet"
-          href="https://unpkg.com/leaflet/dist/leaflet.css"
-        />
+<head>
 
-        <style>
-          html, body, #map {
-            height:100%;
-            margin:0;
-          }
-        </style>
-      </head>
+<meta charset="utf-8"/>
 
-      <body>
+<link
+rel="stylesheet"
+href="https://unpkg.com/leaflet/dist/leaflet.css"/>
 
-        <div id="map"></div>
+<style>
 
-        <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+html,
+body,
+#map{
+height:100%;
+margin:0;
+padding:0;
+}
 
-        <script>
+</style>
 
-          const localizacoes = ${JSON.stringify(localizacoes)};
-          const paradas = ${JSON.stringify(paradas)};
+</head>
 
-          const mostrarOnibus = ${mostrarOnibus};
-          const mostrarParadas = ${mostrarParadas};
-          const mostrarRota = ${mostrarRota};
+<body>
 
-          const map = L.map('map').setView(
-            [${centro.latitude}, ${centro.longitude}],
-            ${zoom}
-          );
+<div id="map"></div>
 
-          L.tileLayer(
-            'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
-            {
-              attribution:'© OpenStreetMap'
-            }
-          ).addTo(map);
+<script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
 
-          // ÔNIBUS 
-          if (mostrarOnibus) {
-            localizacoes.forEach(bus => {
-              L.marker([
-                bus.latitude,
-                bus.longitude
-              ])
-              .addTo(map)
-              .bindPopup(
-                bus.idOnibus.codigo +
-                " - " +
-                bus.idOnibus.placa
-              );
-            });
-          }
+<script>
 
-          // PARADAS
-          if (mostrarParadas) {
-            paradas.forEach(parada => {
-              L.marker([
-                parada.latitude,
-                parada.longitude
-              ])
-              .addTo(map)
-              .bindPopup(parada.nome);
-            });
-          }
+const localizacoes = ${JSON.stringify(localizacoes)};
+const paradas = ${JSON.stringify(paradas)};
 
-          // ROTA 
-          if (mostrarRota && paradas.length > 1) {
+const mostrarOnibus = ${mostrarOnibus};
+const mostrarParadas = ${mostrarParadas};
+const mostrarRota = ${mostrarRota};
 
-            const rota = paradas.map(p => [
-              p.latitude,
-              p.longitude
-            ]);
+const map = L.map('map').setView(
+[
+${centro.latitude},
+${centro.longitude}
+],
+${zoom}
+);
 
-            L.polyline(rota, {
-              color: 'blue',
-              weight: 5
-            }).addTo(map);
+L.tileLayer(
+'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
+{
+attribution:'© OpenStreetMap'
+}
+).addTo(map);
 
-          }
+const bounds = [];
 
-          // Ajusta o zoom automaticamente
-          const pontos = [];
 
-          if (mostrarOnibus) {
-            localizacoes.forEach(bus => {
-              pontos.push([
-                bus.latitude,
-                bus.longitude
-              ]);
-            });
-          }
+// =========================
+// ÔNIBUS
+// =========================
 
-          if (mostrarParadas) {
-            paradas.forEach(parada => {
-              pontos.push([
-                parada.latitude,
-                parada.longitude
-              ]);
-            });
-          }
+if(mostrarOnibus){
 
-          if (pontos.length > 1) {
-            map.fitBounds(pontos);
-          }
+localizacoes.forEach(bus=>{
 
-        </script>
+if(!bus.latitude || !bus.longitude) return;
 
-      </body>
-    </html>
-  `;
+L.marker([
+bus.latitude,
+bus.longitude
+])
+.addTo(map)
+.bindPopup(
+(bus.idOnibus?.codigo || "Ônibus") +
+" - " +
+(bus.idOnibus?.placa || "")
+);
+
+bounds.push([
+bus.latitude,
+bus.longitude
+]);
+
+});
+
+}
+
+
+// =========================
+// PARADAS
+// =========================
+
+if(mostrarParadas){
+
+paradas.forEach(parada=>{
+
+L.circleMarker(
+[
+parada.latitude,
+parada.longitude
+],
+{
+radius:7,
+color:"red",
+fillColor:"red",
+fillOpacity:1
+}
+)
+.addTo(map)
+.bindPopup(parada.nome);
+
+bounds.push([
+parada.latitude,
+parada.longitude
+]);
+
+});
+
+}
+
+
+// =========================
+// ROTA
+// =========================
+
+if(mostrarRota && paradas.length>1){
+
+const rota = paradas.map(p=>[
+p.latitude,
+p.longitude
+]);
+
+L.polyline(
+rota,
+{
+color:"blue",
+weight:5
+}
+).addTo(map);
+
+}
+
+
+// =========================
+// AJUSTA O ZOOM
+// =========================
+
+if(bounds.length>1){
+
+map.fitBounds(bounds,{
+padding:[40,40]
+});
+
+}else if(bounds.length===1){
+
+map.setView(bounds[0],16);
+
+}
+
+</script>
+
+</body>
+
+</html>
+`;
 
   return (
     <WebView

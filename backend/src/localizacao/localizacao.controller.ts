@@ -3,7 +3,8 @@ import {
   Post, 
   Body,
   Get,
-  Param
+  Param,
+  Delete,
 } from '@nestjs/common';
 import { LocalizacaoService } from './localizacao.service';
 import { CreateLocalizacaoDto } from './dto/create-localizacao.dto';
@@ -18,12 +19,27 @@ export class LocalizacaoController {
   }
   
   @Get('onibus/:idOnibus')
-  buscarUltima(@Param('idOnibus') idOnibus: string) {
-    return this.localizacaoService.buscarUltimaLocalizacao(idOnibus);
+  listarPorOnibus(@Param('idOnibus') idOnibus: string) {
+      return this.localizacaoService.listarPorOnibus(idOnibus);
+  }
+
+  @Get('historico')
+  listarHistorico() {
+    return this.localizacaoService.listarHIstorico();
   }
 
   @Get()
   listar() {
-    return this.localizacaoService.listar();
+      return this.localizacaoService.listarUltimasLocalizacoes();
+  }
+
+  @Get('historico/:idOnibus')
+  listarHistoricoOnibus(@Param('idOnibus') idOnibus: string) {
+      return this.localizacaoService.listarHistoricoOnibus(idOnibus);
+  }
+
+  @Delete(':id')
+  remover(@Param('id') id: string) {
+    return this.localizacaoService.remover(id);
   }
 }

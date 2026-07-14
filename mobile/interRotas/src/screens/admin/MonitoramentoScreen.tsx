@@ -5,7 +5,7 @@ import { listarRotas, atualizarRota, deletarRota, Rotas } from '../../services/r
 import { listarMotoristas, Motorista } from '../../services/motoristaService';
 import { listarOnibus, Onibus } from '../../services/onibusService';
 import Mapa from '../../components/Mapa';
-import { Localizacao, listarLocalizacoes } from '../../services/localizacaoService';
+import { Localizacao, listarLocalizacoes, listarLocalizacoesPorOnibus } from '../../services/localizacaoService';
 
 export default function MonitoramentoScreen() {
   const [busca, setBusca] = useState('');
@@ -63,25 +63,23 @@ const [rotaParaDeletar, setRotaParaDeletar] = useState<any>(null);
 
   async function carregarMapa() {
     try {
-      if (!rotaSelecionada) {
-        return;
-      }
+      if (!rotaSelecionada) return;
 
-      const dados = await listarLocalizacoes();
-      const localizacoesDaRota = (Array.isArray(dados) ? dados : []).filter((loc) => {
-        const idOnibusLocalizacao = typeof loc.idOnibus === 'string' ? loc.idOnibus : loc.idOnibus?._id;
-        const idOnibusRota = typeof rotaSelecionada.idOnibus === 'string'
-          ? rotaSelecionada.idOnibus
-          : (rotaSelecionada.idOnibus as { _id?: string } | undefined)?._id;
+      const id =
+        typeof rotaSelecionada.idOnibus === 'object'
+          ? rotaSelecionada.idOnibus._id
+          : rotaSelecionada.idOnibus;
 
-        return idOnibusLocalizacao === idOnibusRota;
-      });
+      if (!id) return;
 
-      setLocalizacoes(localizacoesDaRota);
+      const dados = await listarLocalizacoesPorOnibus(id);
+
+      setLocalizacoes(dados);
     } catch (err) {
-      console.log("Erro ao carregar mapa", err);
+      console.log(err);
     }
   }
+
   const onibusAtual = todosOnibus.find(o => o.placa === idOnibusSelecionado);
   const motoristaAtual = todosMotoristas.find(m => m.nome === idMotoristaSelecionado);
 
@@ -97,6 +95,12 @@ const [rotaParaDeletar, setRotaParaDeletar] = useState<any>(null);
     setRotaSelecionada(item);
     setModalDetalhesVisivel(true);
   }
+
+  useEffect(() => {
+    if (rotaSelecionada) {
+      carregarMapa();
+    }
+  }, [rotaSelecionada]);
 
   function iniciarEdicao(item: Rotas) {
     
@@ -175,8 +179,9 @@ const [rotaParaDeletar, setRotaParaDeletar] = useState<any>(null);
                 <View style={styles.mapContainer}>
                   <Mapa 
                   localizacoes={localizacoes} 
-                  paradas={rotaSelecionada.paradas} 
-                  mostrarOnibus={true} mostrarParadas={true} 
+                  paradas={rotaSelecionada.paradas || []} 
+                  mostrarOnibus={true} 
+                  mostrarParadas={true} 
                   mostrarRota={true} 
                   />
                 </View>
