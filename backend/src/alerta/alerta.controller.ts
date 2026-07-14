@@ -12,10 +12,14 @@ import {
 import { AlertaService } from './alerta.service';
 import { CreateAlertaDto } from './dto/create-alerta.dto';
 import { UpdateAlertaDto } from './dto/update-alerta.dto';
+import { RotasService } from '../rotas/rotas.service';
 
 @Controller('alerta')
 export class AlertaController {
-  constructor(private readonly alertaService: AlertaService) {}
+  constructor(
+    private readonly alertaService: AlertaService,
+    private readonly rotasService: RotasService
+  ) {}
 
   @Get()
   listar() {
@@ -40,5 +44,15 @@ export class AlertaController {
   @Delete(':id')
   remover(@Param('id') id: string) {
     return this.alertaService.remover(id);
+  }
+
+  @Post(':id/rastreio')
+  async atualizarRastreio(
+    @Param('id') idRota: string,
+    @Body('latitude') latitude: number,
+    @Body('longitude') longitude: number,
+  ) {
+    // O controller só recebe os dados e repassa para o Service processar
+    return await this.rotasService.processarRastreio(idRota, latitude, longitude);
   }
 }

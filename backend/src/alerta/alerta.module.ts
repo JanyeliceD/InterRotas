@@ -3,11 +3,12 @@ import { AlertaController } from './alerta.controller';
 import { AlertaService } from './alerta.service';
 import { MongooseModule } from '@nestjs/mongoose';
 import { Alerta, AlertaSchema } from '../schemas/alerta.schema';
-
+import { RotaSchema } from 'src/schemas/rota.schema';
 @Module({
   imports: [
     MongooseModule.forFeature([
-      { name: Alerta.name, schema: AlertaSchema }
+      { name: Alerta.name, schema: AlertaSchema },
+      { name: 'Rota', schema: RotaSchema }
     ])
   ],
   controllers: [AlertaController],

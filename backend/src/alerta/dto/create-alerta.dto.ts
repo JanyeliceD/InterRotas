@@ -1,4 +1,4 @@
-import { IsString, IsNotEmpty, IsDateString, IsMongoId, IsOptional } from "class-validator"; 
+import { IsNumber, IsString, IsNotEmpty, IsDateString, IsMongoId, IsOptional } from "class-validator"; 
 
 export class CreateAlertaDto {
     @IsString({ message: "Onibus ID é obrigatório" })
@@ -13,4 +13,16 @@ export class CreateAlertaDto {
     @IsString()
     @IsOptional()
     descricao?: string;
+
+    @IsString()
+    @IsOptional()
+    idRota?: string;
+
+    @IsNumber({}, { message: "Latitude atual deve ser um número" })
+    @IsOptional()
+    latitudeAtual?: number;
+
+    @IsNumber({}, { message: "Longitude atual deve ser um número" })
+    @IsOptional()
+    longitudeAtual?: number;
 }
