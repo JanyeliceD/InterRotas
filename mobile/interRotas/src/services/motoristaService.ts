@@ -1,8 +1,9 @@
 import { api } from './api';
 
 export interface Motorista {
-    _id: string;
-    matricula: string;
+    _id?: string;
+    id?: string;
+    matricula?: string;
     nome: string;
 }
 

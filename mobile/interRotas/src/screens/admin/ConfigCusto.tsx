@@ -17,7 +17,7 @@ export default function ConfigScreen() {
   const [listaConsumo, setListaConsumo] = useState<RotaConsumo[]>([]);
   const [carregando, setCarregando] = useState(false);
 
-  // Carrega o preço e o relatório de consumo simultaneamente
+  
   async function carregarDadosIniciais() {
     try {
       setCarregando(true);
@@ -35,7 +35,7 @@ export default function ConfigScreen() {
         setListaConsumo(dadosConsumo);
       }
     } catch (error) {
-      console.log('🛑 Erro ao sincronizar com o Servidor:', error);
+      console.log('Erro ao sincronizar com o Servidor:', error);
       setPrecoDiesel('5.90'); 
     } finally {
       setCarregando(false);
@@ -59,8 +59,7 @@ export default function ConfigScreen() {
       await salvarPrecoDieselBackend(precoFormatado);
       Alert.alert('Sucesso', `Preço atualizado para R$ ${precoFormatado.toFixed(2)}!`);
       
-      // Recarrega os dados para atualizar os custos totais na tela na mesma hora!
-      await carregarDadosIniciais();
+           await carregarDadosIniciais();
     } catch (error) {
       Alert.alert('Erro', 'Não foi possível salvar o preço no servidor.');
       setCarregando(false);
@@ -83,8 +82,7 @@ export default function ConfigScreen() {
           carregando ? null : <Text style={styles.vazioText}>Nenhuma rota cadastrada para calcular consumo.</Text>
         }
         
-        // Renderização dos CARDS FINANCEIROS DINÂMICOS 💳
-        renderItem={({ item }) => (
+           renderItem={({ item }) => (
           <View style={styles.consumoCard}>
             <Text style={styles.rotaNome}>{item.nome}</Text>
             
@@ -170,9 +168,7 @@ const styles = StyleSheet.create({
   botaoSalvar: { backgroundColor: '#1E40AF', paddingVertical: 12, borderRadius: 8, alignItems: 'center', justifyContent: 'center' },
   textoBotao: { color: '#FFFFFF', fontSize: 14, fontWeight: '600' },
   vazioText: { textAlign: 'center', color: '#64748B', marginTop: 20, fontSize: 14 },
-  
-  // Estilos dos Cards Analíticos
-  consumoCard: {
+   consumoCard: {
     backgroundColor: '#FFFFFF',
     borderRadius: 12,
     padding: 16,
@@ -191,5 +187,5 @@ const styles = StyleSheet.create({
   detalheLabel: { fontSize: 13, color: '#64748B' },
   detalheValor: { fontSize: 13, fontWeight: '600', color: '#334155' },
   custoLabel: { fontSize: 14, fontWeight: '700', color: '#1E40AF' },
-  custoValor: { fontSize: 15, fontWeight: '800', color: '#16A34A' }, // Verde para dinheiro
+  custoValor: { fontSize: 15, fontWeight: '800', color: '#16A34A' }, 
 });

@@ -156,8 +156,10 @@ export default function OcorrenciasScreen() {
             </View>
 
             <Text style={styles.idOnibus}>
-                {item.idOnibus.codigo} - {item.idOnibus.placa}
-              </Text>
+              {item.idOnibus?.codigo && item.idOnibus?.placa
+                ? `${item.idOnibus.codigo} - ${item.idOnibus.placa}`
+                : 'Ônibus não encontrado'}
+            </Text>
 
             <Text style={styles.tipo}>
               {formatarTipo(item.tipo)}

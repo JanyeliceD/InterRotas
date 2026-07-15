@@ -5,7 +5,7 @@ import { RootStackParamList } from '../../navigation/RootNavigator';
 import { Pressable, Text, View, TextInput, Alert, ActivityIndicator } from 'react-native';
 import { styles } from './styles';
 import { useState } from 'react';
-// import * as SecureStore from 'expo-secure-store'; // Se usar Expo
+import api from '../../services/api';
 
 type DadosLogin = {
     usuario: string;
@@ -28,53 +28,41 @@ export default function LoginScreen() {
 
   const [login, setLogin] = useState<DadosLogin>({ usuario: '', senha: '' });
   const [erros, setErros] = useState<LoginErrors>({});
-  const [carregando, setCarregando] = useState<boolean>(false); // Proteção contra duplo clique
+  const [carregando, setCarregando] = useState<boolean>(false); 
 
   async function entrar() {
-  const errosEncontrados = validarLogin(login);
-  setErros(errosEncontrados);
+    const errosEncontrados = validarLogin(login);
+    setErros(errosEncontrados);
 
-  if (Object.keys(errosEncontrados).length > 0) return;
+    if (Object.keys(errosEncontrados).length > 0) return;
 
-  setCarregando(true);
+    setCarregando(true);
 
-  try {
-    const url = 'http://10.48.9.150:3000/auth/login';
-    const corpoRequisicao = {
-      usuario: login.usuario.trim().toLowerCase(),
-      senha: login.senha,
-    };
+    try {
+      const corpoRequisicao = {
+        usuario: login.usuario.trim().toLowerCase(),
+        senha: login.senha,
+      };
 
-    const resposta = await fetch(url, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(corpoRequisicao),
-    });
+      // 🚀 Chamando a URL oficial do Render configurada no seu axios
+      const resposta = await api.post('/auth/login', corpoRequisicao);
+      const dados = resposta.data;
 
-    const dados = await resposta.json();
+      if (dados.role === 'admin') {
+         navigation.navigate('AppDrawer'); 
+      } else if (dados.role === 'motorista') {
+         navigation.navigate('MotoristaHome'); 
+      } else {
+         Alert.alert('Erro no Login', 'Tipo de usuário não reconhecido.');
+      }
 
-    if (!resposta.ok) {
-      throw new Error(dados.message || 'Credenciais inválidas.');
+    } catch (error: any) {
+      const mensagemErro = error.response?.data?.message || 'Falha ao conectar com o servidor.';
+      Alert.alert('Erro no Login', mensagemErro);
+    } finally {
+      setCarregando(false);
     }
-
-    // Navegação baseada no tipo de usuário retornado pelo MongoDB
-    if (dados.role === 'admin') {
-       navigation.navigate('AppDrawer'); 
-    } else if (dados.role === 'motorista') {
-       navigation.navigate('MotoristaHome'); 
-    } else {
-       Alert.alert('Erro no Login', 'Tipo de usuário não reconhecido.');
-    }
-
-  } catch (error: any) {
-    Alert.alert('Erro no Login', error.message || 'Falha ao conectar com o servidor.');
-  } finally {
-    setCarregando(false);
-  }
-
-}
+  } // <-- Chave da função entrar corrigida!
 
   return (
     <View style={styles.container}>
@@ -87,7 +75,7 @@ export default function LoginScreen() {
           onChangeText={(texto) => setLogin({...login, usuario: texto})}
           style={styles.input}
           autoCapitalize="none"
-          editable={!carregando} // Desabilita enquanto carrega
+          editable={!carregando} 
         />
         {erros.usuario && <Text style={{ color: 'red', marginBottom: 8, marginLeft: 4 }}>{erros.usuario}</Text>}
 
@@ -98,7 +86,7 @@ export default function LoginScreen() {
           onChangeText={(texto) => setLogin({...login, senha: texto})}
           secureTextEntry
           style={styles.input}
-          editable={!carregando} // Desabilita enquanto carrega
+          editable={!carregando} 
         />
         {erros.senha && <Text style={{ color: 'red', marginBottom: 8, marginLeft: 4 }}>{erros.senha}</Text>}  
 

@@ -10,14 +10,13 @@ import {
 } from 'react-native';
 import { useState } from 'react';
 import { useEffect } from 'react';
-import { buscarOnibusPorPlaca, listarOnibus } from '../../services/onibusService';
+import { buscarOnibusPorPlaca, listarOnibus, Onibus } from '../../services/onibusService';
 
 import {
   Ocorrencia,
   registrarOcorrencia,
   listarOcorrencias,
   TipoOcorrencia,
-  Onibus,
 } from '../../services/ocorrenciaService';
 
 const tiposOcorrencia = [
@@ -34,11 +33,12 @@ export default function RegistrarOcorrenciaScreen({ navigation }: any) {
   const [observacao, setObservacao] = useState('');
   const [loading, setLoading] = useState(true);
 
-  {/*Modal do ônibus*/}
-  const [idOnibus, setidOnibus] = useState('');
-  const [onibusNome, setOnibusNome] = useState('');
+  
+  const [idOnibus, setIdOnibus] = useState('');
+  const [onibusSelecionado, setOnibusSelecionado] = useState<Onibus | null>(null);
   const [onibus, setOnibus] = useState<Onibus[]>([]);
   const [modalOnibus, setModalOnibus] = useState(false);
+  const [onibusPlaca, setOnibusPlaca] = useState('');
 
   useEffect(() => {
     carregarOnibus();
@@ -54,8 +54,6 @@ export default function RegistrarOcorrenciaScreen({ navigation }: any) {
   }
 
   async function enviarOcorrencia() {
-    const onibus = await buscarOnibusPorPlaca(placa);
-
     if (!idOnibus || !tipoSelecionado) {
       Alert.alert(
         'Validação',
@@ -87,7 +85,7 @@ export default function RegistrarOcorrenciaScreen({ navigation }: any) {
 
     navigation.navigate('MotoristaHome', {
     ultimaOcorrencia: {
-      placa,
+      placa: onibusSelecionado?.placa,
       tipo: tipoSelecionado,
       observacao,
       horario: new Date().toLocaleTimeString(),
@@ -101,27 +99,54 @@ export default function RegistrarOcorrenciaScreen({ navigation }: any) {
 
   return (
     <View style={styles.container}>
-    {/* MODAL SELEÇÃO ÔNIBUS */}
-      <Modal visible={modalOnibus} transparent animationType="slide">
-        <View style={styles.modalOverlay}>
-          <View style={styles.modalContainer}>
-            <Text style={styles.modalTitulo}>Selecione o Ônibus</Text>
-            {onibus.map((item) => (
-              <TouchableOpacity
-                key={item._id}
-                style={styles.paradaItem}
-                onPress={() => {
-                  setidOnibus(item._id);
-                  setOnibusNome(`${item.codigo} - ${item.placa}`);
-                  setModalOnibus(false);
-                }}
-              >
-                <Text>{item.codigo} - {item.placa}</Text>
-              </TouchableOpacity>
-            ))}
-          </View>
-        </View>
-      </Modal>
+       {/* MODAL SELEÇÃO ÔNIBUS */}
+             <Modal
+               visible={modalOnibus}
+               transparent
+               animationType="slide"
+               onRequestClose={() => setModalOnibus(false)}
+             >
+               <View style={styles.modalOverlay}>
+                 <View style={styles.modalContainer}>
+       
+                   <Text style={styles.modalTitulo}>
+                     Selecione o Ônibus
+                   </Text>
+       
+                   <FlatList
+                     data={onibus}
+                     keyExtractor={(item, index) => item._id ?? index.toString()}
+                     style={styles.listaParadas}
+                     renderItem={({ item }) => (
+                       <TouchableOpacity
+                         style={styles.paradaItem}
+                         onPress={() => {
+                          if (!item._id) return;
+
+                          setIdOnibus(item._id);
+                          setOnibusSelecionado(item);
+                          setModalOnibus(false);
+                        }}
+                       >
+                         <Text>
+                           {item.codigo} - {item.placa}
+                         </Text>
+                       </TouchableOpacity>
+                     )}
+                   />
+       
+                   <TouchableOpacity
+                     style={styles.botaoCancelarSeletor}
+                     onPress={() => setModalOnibus(false)}
+                   >
+                     <Text style={styles.buttonText}>
+                       Cancelar
+                     </Text>
+                   </TouchableOpacity>
+       
+                 </View>
+               </View>
+             </Modal>
 
       <Text style={styles.title}>
         Registrar Ocorrência
@@ -132,8 +157,10 @@ export default function RegistrarOcorrenciaScreen({ navigation }: any) {
         onPress={() => setModalOnibus(true)}
       >
       <Text>
-        {onibusNome || 'Selecionar ônibus'}
-      </Text>
+      {onibusSelecionado
+        ? `${onibusSelecionado.codigo} - ${onibusSelecionado.placa}`
+        : 'Selecionar ônibus'}
+    </Text>
       </TouchableOpacity>
 
       <Text style={styles.label}>
@@ -265,11 +292,6 @@ const styles = StyleSheet.create({
     justifyContent: 'center', 
     padding: 16 
   },
-  modalContainer: { 
-    backgroundColor: '#FFF', 
-    borderRadius: 12, 
-    padding: 20 
-  },
   modalTitulo: { 
     fontSize: 20, 
     fontWeight: 'bold', 
@@ -283,4 +305,19 @@ const styles = StyleSheet.create({
     borderRadius: 8, 
     marginBottom: 10 
   },
+  modalContainer: {
+    backgroundColor: '#FFF',
+    borderRadius: 12,
+    padding: 20,
+    maxHeight: '80%',
+    width: '100%',
+  },
+  paradaSelecionada: { backgroundColor: '#DBEAFE', borderColor: '#1E40AF' },
+  paradaTexto: { fontSize: 16 },
+  botaoCancelarSeletor: { backgroundColor: '#64748B', paddingVertical: 12, borderRadius: 8, alignItems: 'center', marginTop: 10 },
+  mapContainer: { height: 300, borderRadius: 12, overflow: 'hidden', marginBottom: 12 },
+  listaParadas: {
+  maxHeight: 300,
+  marginBottom: 15,
+},
 });

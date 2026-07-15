@@ -7,10 +7,10 @@ export async function salvarPrecoDieselBackend(preco: number) {
 } 
 export async function buscarPrecoDieselBackend() {
   const resposta = await api.get<Config[]>('config/diesel');
-  return resposta.data; // Retorna o { precoDiesel }
+  return resposta.data; 
 }
 
 export async function buscarRelatorioConsumoBackend() {
   const resposta = await api.get<Config[]>('config/consumo-rotas');
-  return resposta.data; // Retorna o array de rotas calculadas
+  return resposta.data; 
 }

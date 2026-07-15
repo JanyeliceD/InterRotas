@@ -17,3 +17,11 @@ export async function listarLocalizacoes() {
 
     return response.data;
 }
+
+export async function listarLocalizacoesPorOnibus(idOnibus: string) {
+  const response = await api.get<Localizacao[]>(
+    `/localizacao/onibus/${idOnibus}`
+  );
+
+  return response.data;
+}
