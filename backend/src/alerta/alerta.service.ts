@@ -4,14 +4,15 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Alerta, AlertaDocument } from '../schemas/alerta.schema';
 import { CreateAlertaDto } from './dto/create-alerta.dto';
 import { UpdateAlertaDto } from './dto/update-alerta.dto';
-
+import {Rota,RotaDocument} from '../schemas/rota.schema';
 //Alerta que o backend vai receber do dispositivo
 
 @Injectable()
 export class AlertaService {
   constructor(
-    @InjectModel(Alerta.name) private AlertaModel: Model<AlertaDocument>
-  ) {}
+    @InjectModel(Alerta.name) private AlertaModel: Model<AlertaDocument>,
+    @InjectModel('Rota') private readonly rotaModel: Model<RotaDocument> 
+) {}
 
   // 🧮 Função auxiliar da Fórmula de Haversine
   private calcularDistancia(lat1: number, lon1: number, lat2: number, lon2: number): number {

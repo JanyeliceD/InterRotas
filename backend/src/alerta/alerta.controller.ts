@@ -6,19 +6,16 @@ import {
   Param,
   Patch,
   Post,
-  Put,
-  Query,
 } from '@nestjs/common';
 import { AlertaService } from './alerta.service';
 import { CreateAlertaDto } from './dto/create-alerta.dto';
 import { UpdateAlertaDto } from './dto/update-alerta.dto';
-import { RotasService } from '../rotas/rotas.service';
 
 @Controller('alerta')
 export class AlertaController {
   constructor(
     private readonly alertaService: AlertaService,
-    private readonly rotasService: RotasService
+    // Removemos o RotasService porque a lógica agora roda dentro do AlertaService!
   ) {}
 
   @Get()
@@ -46,13 +43,18 @@ export class AlertaController {
     return this.alertaService.remover(id);
   }
 
+  // 🟢 Rota de rastreio com sintaxe corrigida e chaves organizadas!
   @Post(':id/rastreio')
   async atualizarRastreio(
     @Param('id') idRota: string,
-    @Body('latitude') latitude: number,
-    @Body('longitude') longitude: number,
+    @Body() body: { latitude: number; longitude: number; idOnibus: string; idRota: string;tipo: 'DESVIO_ROTA' | 'ATRASO' | 'LOTACAO' | 'OUTRO' },
   ) {
-    // O controller só recebe os dados e repassa para o Service processar
-    return await this.rotasService.processarRastreio(idRota, latitude, longitude);
+    return await this.alertaService.criar({
+      idOnibus: body.idOnibus,
+      idRota: body.idRota,
+      tipo: 'DESVIO_ROTA', // Tipo de alerta fixo para rastreio
+      latitudeAtual: body.latitude,
+      longitudeAtual: body.longitude,
+    });
   }
 }
