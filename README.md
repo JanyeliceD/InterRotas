@@ -6,11 +6,10 @@
 
 ##  Índice
 * [Sobre o Projeto](#-sobre-o-projeto)
+* [Como Executar o Projeto](#-Inicializar-projeto)
 * [Funcionalidades](#-funcionalidades)
 * [Tecnologias Utilizadas](#-tecnologias-utilizadas)
 * [Arquitetura do Sistema](#-arquitetura-do-sistema)
-* [Como Executar o Projeto](#-como-executar-o-projeto)
-* [Estrutura de Arquivos](#-estrutura-de-arquivos)
 * [Autores](#-autores)
 
 ---
@@ -23,21 +22,70 @@ Este projeto integra IoT (Internet das Coisas), persistência de dados robusta e
 
 ---
 
+
+##  Inicializar Projeto
+## Pré-requisitos e Instalação de Tecnologias
+
+Antes de inicializar o projeto, você precisa ter as ferramentas básicas instaladas na sua máquina:
+
+### 1. Ferramentas Essenciais
+* Node.js (versão LTS recomendada): [Baixar Node.js](https://nodejs.org/)
+
+### 2. Instalações Globais (CLI)
+Abra o seu terminal e instale as ferramentas necessárias para rodar o NestJS e o Expo globalmente:
+
+```
+bash
+npm install -g @nestjs/cli npm install -g expo-cli 
+```
+
+Roteiro de Inicialização do Projeto
+
+Siga o passo a passo abaixo para clonar, instalar as dependências e rodar o projeto completo:
+Bash
+
+# 1. Clonar o repositório e entrar na pasta do projeto
+
+```
+git clone https://github.com/JanyeliceD/InterRotas.git
+cd InterRotas
+
+```
+
+
+# 2. Configurar e rodar o Backend (NestJS)
+```
+cd backend
+npm install
+npm run start:dev
+```
+
+# 3. Configurar e rodar o Mobile (Abra um novo terminal na pasta raiz 'InterRotas' para executar os passos abaixo)
+```
+cd ../
+cd mobile
+npm install
+npx expo start
+## Pré-requisitos e Instalação de Tecnologias
+```
+
+
+
 ##  Funcionalidades
 
 ###  Módulo do Gestor de Frotas (Painel Principal)
-- [x] **Monitoramento em Tempo Real:** Visualização ao vivo da localização exata de cada ônibus em um mapa interativo na tela inicial.
-- [x] **Cálculo de Gastos com Combustível:** Relatório financeiro automatizado calculando o consumo e os custos de combustível nos **últimos 30 dias**.
-- [x] **Alertas Automáticos Inteligentes:** Notificações em tempo real caso algum veículo sofra **atrasos significativos** ou **desvios da rota prevista**.
-- [x] **Central de Ocorrências:** Painel para recebimento, triagem e tratamento de alertas enviados pelos motoristas.
+- **Monitoramento em Tempo Real:** Visualização ao vivo da localização exata de cada ônibus em um mapa interativo na tela inicial.
+- **Cálculo de Gastos com Combustível:** Relatório financeiro automatizado calculando o consumo e os custos de combustível nos **últimos 30 dias**.
+- **Alertas Automáticos Inteligentes:** Notificações em tempo real caso algum veículo sofra **atrasos significativos** ou **desvios da rota prevista**.
+- **Central de Ocorrências:** Painel para recebimento, triagem e tratamento de alertas enviados pelos motoristas.
 
 ###  Módulo do Motorista
-- [x] **Área de Login Exclusiva:** Ambiente seguro para o motorista se identificar no veículo operante.
-- [x] **Cadastro e Envio de Ocorrências:** Canal direto para relatar sinistros, problemas mecânicos, trânsito atípico ou emergências diretamente para o gestor.
+- **Área de Login Exclusiva:** Ambiente seguro para o motorista se identificar no veículo operante.
+- **Cadastro e Envio de Ocorrências:** Canal direto para relatar sinistros, problemas mecânicos, trânsito atípico ou emergências diretamente para o gestor.
 
 ###  Telemetria & Infraestrutura
-- [x] **Geolocalização Contínua:** Envio periódico de coordenadas (latitude/longitude) do veículo.
-- [x] **Mapeamento de Linhas:** Exibição gráfica dos trajetos e pontos de parada na interface.
+-  **Geolocalização Contínua:** Envio periódico de coordenadas (latitude/longitude) do veículo.
+-  **Mapeamento de Linhas:** Exibição gráfica dos trajetos e pontos de parada na interface.
 
 ---
 
@@ -76,10 +124,10 @@ O fluxo de comunicação e persistência do interRotas segue a lógica abaixo:
 
 Abaixo estão os desenvolvedores responsáveis pela concepção, circuitos IoT e codificação do ecossistema interRotas:
 
-* **Janyelice Viviane Dantas Soares** - *Scrum Master, Desenvolvedora Full Stack(BackEnd, Desenvolvimento Mobile* - [GitHub @JanyeliceD](https://github.com/JanyeliceD)
-* **Maria Alice de Medeiros Silva** - * Desenvolvedora Full Stack(BackEnd, Banco de Dados, Designer do protótipo Mobile) * -
-* **Rômulo César do Nascimento Santos** - * Pesquisa e integração dos componentes IoT * -
-* **Wellington Jerônimo da Silva** -  * Documentação e Pesquisa e integração dos componentes IoT * - 
+* **Janyelice Viviane Dantas Soares** - *Scrum Master, Desenvolvedora Full Stack(BackEnd, Desenvolvimento Mobile* 
+* **Maria Alice de Medeiros Silva** - * Desenvolvedora Full Stack(BackEnd, Banco de Dados, Designer do protótipo Mobile)* 
+* **Rômulo César do Nascimento Santos** - * Pesquisa e integração dos componentes IoT* 
+* **Wellington Jerônimo da Silva** -  * Documentação e Pesquisa e integração dos componentes IoT*  
 
 
 
