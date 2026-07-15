@@ -9,11 +9,8 @@ import {
   Alert 
 } from 'react-native';
 import { useState, useEffect } from 'react';
-import MapView from 'react-native-maps'; 
 import Mapa from '../../components/Mapa'; 
-import { Localizacao } from '../../services/localizacaoService'; 
-import { listarLocalizacoes } from '../../services/localizacaoService';
-
+import { listarLocalizacoes, Localizacao } from '../../services/localizacaoService';
 import { listarRotas, Rotas } from '../../services/rotaService'; 
 
 export default function DashboardScreen() {
@@ -67,17 +64,6 @@ export default function DashboardScreen() {
 
   async function carregarMapa() {
     const dados = await listarLocalizacoes();
-    
-    console.log("Quantidade:", dados.length);
-
-    dados.forEach((item) => {
-        console.log(
-            item.idOnibus?.codigo,
-            item.idOnibus?.placa,
-            item.latitude,
-            item.longitude
-        );
-    });
 
     setTodosOsOnibus(dados);
 }
@@ -135,7 +121,7 @@ export default function DashboardScreen() {
                 <Text style={styles.rotaNome} numberOfLines={1}>{item.nome}</Text>
                 
                 <Text style={styles.rotaDetalhe}>
-                  <Text style={styles.boldText}>Veículo: BUS001</Text>
+                  <Text style={styles.boldText}>Veículo: </Text>{item.idOnibus}
                 </Text>
                 
                 <Text style={styles.rotaDetalhe}>

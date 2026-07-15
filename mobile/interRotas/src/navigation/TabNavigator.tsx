@@ -10,6 +10,9 @@ import CadastrosScreen from "../screens/admin/CadastrosScreen";
 import AlertasScreen from "../screens/admin/AlertasScreen";
 import OcorrenciasScreen from "../screens/admin/OcorrenciasScreen";
 
+import { useEffect, useState } from 'react';
+import { listarOcorrencias } from '../services/ocorrenciaService';
+
 export type RootTabParamList = {
     Dashboard: undefined;
     Monitoramento: undefined;
@@ -28,6 +31,32 @@ function obterIcone(nomeRota: keyof RootTabParamList, focused: boolean) {
 }
 
 export default function TabNavigator() {
+    const [quantidadeOcorrencias, setQuantidadeOcorrencias] = useState(0);
+
+    useEffect(() => {
+        carregarOcorrencias();
+
+        const intervalo = setInterval(() => {
+            carregarOcorrencias();
+        }, 10000); // atualiza a cada 10 segundos
+
+        return () => clearInterval(intervalo);
+        }, []);
+
+        async function carregarOcorrencias() {
+        try {
+            const ocorrencias = await listarOcorrencias();
+
+            const abertas = ocorrencias.filter(
+            (o: any) => o.status === 'ABERTA'
+            );
+
+            setQuantidadeOcorrencias(abertas.length);
+        } catch (error) {
+            console.log(error);
+        }
+    }
+
     return (
         <Tab.Navigator
             initialRouteName="Dashboard"
@@ -63,29 +92,31 @@ export default function TabNavigator() {
                         color="#F1F5F9"
                     />
 
-                    <View
-                        style={{
-                        position: 'absolute',
-                        right: -4,
-                        top: -2,
-                        backgroundColor: '#EF4444',
-                        borderRadius: 8,
-                        minWidth: 16,
-                        height: 16,
-                        justifyContent: 'center',
-                        alignItems: 'center',
-                        }}
-                    >
-                        <Text
-                        style={{
-                            color: '#fff',
-                            fontSize: 10,
-                            fontWeight: 'bold',
-                        }}
+                    {quantidadeOcorrencias > 0 && (
+                        <View
+                            style={{
+                            position: 'absolute',
+                            right: -4,
+                            top: -2,
+                            backgroundColor: '#EF4444',
+                            borderRadius: 8,
+                            minWidth: 16,
+                            height: 16,
+                            justifyContent: 'center',
+                            alignItems: 'center',
+                            }}
                         >
-                        3
-                        </Text>
-                    </View>
+                            <Text
+                            style={{
+                                color: '#fff',
+                                fontSize: 10,
+                                fontWeight: 'bold',
+                            }}
+                            >
+                            {quantidadeOcorrencias}
+                            </Text>
+                        </View>
+                        )}
                     </View>
                 </TouchableOpacity>
                 ),
